@@ -122,6 +122,37 @@ function cPatch(table,match,data){
     body:JSON.stringify(data)
   }).catch(function(){});
 }
+function cDelete(table,extId,extra){
+  var qs='or=(external_id.eq.'+encodeURIComponent(extId)+',id.eq.'+encodeURIComponent(extId)+')';
+  if(extra){Object.keys(extra).forEach(function(k){qs+='&'+k+'=eq.'+encodeURIComponent(extra[k]);});}
+  return fetch(SU+'/rest/v1/'+table+'?'+qs,{
+    method:'DELETE',
+    headers:{'apikey':SK,'Authorization':'Bearer '+SK}
+  }).catch(function(){});
+}
+function recSignature(r){
+  var copy={};
+  Object.keys(r||{}).sort().forEach(function(k){
+    if(k==='id'||k==='external_id'||k==='created_at'||k==='ts')return;
+    copy[k]=r[k];
+  });
+  return JSON.stringify(copy);
+}
+// Merges local (IndexedDB) + cloud (Supabase) records without duplicating,
+// and without letting cloud "resurrect" records that were deleted locally.
+function mergeCloudLocal(local,cloud){
+  var map={},order=[];
+  (local||[]).forEach(function(r){
+    var key=(r.external_id!=null)?('e'+r.external_id):('s'+recSignature(r));
+    if(!(key in map))order.push(key);
+    map[key]=r;
+  });
+  (cloud||[]).forEach(function(r){
+    var key=(r.external_id!=null)?('e'+r.external_id):('s'+recSignature(r));
+    if(!(key in map)){order.push(key);map[key]=r;}
+  });
+  return order.map(function(k){return map[k];});
+}
 
 // ============================================================
 // TOAST / MODAL
@@ -236,6 +267,7 @@ function startApp(){
   document.getElementById('MA').style.display='flex';
   initUI();
   loadDash();
+  loadV();loadE();loadLeads();loadAttHist();
   if(CU && CU.role==='admin'){
     document.getElementById('adminNavBtn').style.display='flex';
   }
@@ -336,9 +368,7 @@ function initUI(){
   ['vvd','edf','edt','adate'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.value=td;
   });
-  var as=localStorage.getItem('wrc_ai_svc');
   var ak=localStorage.getItem('wrc_ai_key');
-  if(as){var el=document.getElementById('aiSvc');if(el)el.value=as;}
   if(ak){var el2=document.getElementById('aiK');if(el2)el2.value=ak;}
   populateModalDropdowns();
   setupPWA();
@@ -410,9 +440,8 @@ function renderVList(list){
 }
 function loadV(){
   dbAll('visitors').then(function(v){
-    allV=v;
     cGet('visitors').then(function(cv){
-      if(cv&&cv.length>allV.length)allV=cv;
+      allV=mergeCloudLocal(v,cv);
       renderV();
     });
   });
@@ -494,12 +523,15 @@ function saveV(){
     data.meetLink=mlEl?mlEl.value:'';
   }
 
-  dbAdd('visitors',data).then(function(){
-    cPost('visitors',data);
-    closeM('mav');
-    clearVForm();
-    toast('✅ Visit saved!');
-    loadV();loadDash();
+  dbAdd('visitors',data).then(function(id){
+    data.id=id;data.external_id=id;
+    dbPut('visitors',data).then(function(){
+      cPost('visitors',data);
+      closeM('mav');
+      clearVForm();
+      toast('✅ Visit saved!');
+      loadV();loadDash();
+    });
   });
 }
 function clearVForm(){
@@ -555,6 +587,7 @@ function delV(id){
   if(!confirm('Delete this record?'))return;
   dbDel('visitors',id).then(function(){
     allV=allV.filter(function(x){return x.id!==id;});
+    cDelete('visitors',id,{user_org:CU.orgKey});
     closeM('mvd');renderV();loadDash();
     toast('Deleted');
   });
@@ -686,12 +719,15 @@ function saveE(){
     user_name:CU.name
   };
   rData=null;
-  dbAdd('expenses',data).then(function(){
-    cPost('expenses',data);
-    closeM('mae');
-    clearEForm();
-    toast('✅ Expense saved!');
-    loadE();
+  dbAdd('expenses',data).then(function(id){
+    data.id=id;data.external_id=id;
+    dbPut('expenses',data).then(function(){
+      cPost('expenses',data);
+      closeM('mae');
+      clearEForm();
+      toast('✅ Expense saved!');
+      loadE();
+    });
   });
 }
 function clearEForm(){
@@ -714,9 +750,8 @@ function setEF(f,el){
 }
 function loadE(){
   dbAll('expenses').then(function(e){
-    allE=e;
     cGet('expenses').then(function(ce){
-      if(ce&&ce.length>allE.length)allE=ce;
+      allE=mergeCloudLocal(e,ce);
       var ti=allE.reduce(function(s,x){return s+(x.cur==='INR'?+x.amt:+x.amt*N2I);},0);
       var tn=allE.reduce(function(s,x){return s+(x.cur==='NPR'?+x.amt:+x.amt*I2N);},0);
       document.getElementById('etinr').textContent='₹'+Math.round(ti).toLocaleString('en-IN');
@@ -728,8 +763,11 @@ function loadE(){
 function renderE(){
   var list=allE.slice().reverse();
   if(eSF!=='all')list=list.filter(function(e){return e.cat===eSF;});
+  var qEl=document.getElementById('esrch');
+  var q=qEl?qEl.value.toLowerCase():'';
+  if(q)list=list.filter(function(e){return JSON.stringify(e).toLowerCase().indexOf(q)>-1;});
   var el=document.getElementById('elist');
-  if(!list.length){el.innerHTML='<div class="empty"><div class="emico">🧾</div><div class="emtxt">No expenses</div></div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty"><div class="emico">🧾</div><div class="emtxt">No expenses found</div></div>';return;}
   var icons={Travel:'🚗',Food:'🍽️',Hotel:'🏨',Media:'📰',Other:'📦'};
   var cols={Travel:'#ff9a5c',Food:'#06d6a0',Hotel:'#b39dff',Media:'#4fc3f7',Other:'#ffd166'};
   el.innerHTML=list.map(function(x){
@@ -744,11 +782,21 @@ function renderE(){
       +'<div class="liname">'+x.cat+(sub?' — '+sub:'')+'</div>'
       +'<div class="limeta">'+(x.df||'')+' '+(x.pm?'· '+x.pm:'')+'</div>'
       +'</div>'
-      +'<div class="lirght">'
+      +'<div class="lirght" style="align-items:flex-end;gap:4px;">'
       +'<div style="font-size:15px;font-weight:700;color:'+col+';">'+(x.cur==='INR'?'₹':'रू')+parseFloat(x.amt).toLocaleString()+'</div>'
       +'<div style="font-size:10px;color:var(--t3);">'+(x.cur==='INR'?'रू'+anpr+' NPR':'₹'+ainr+' INR')+'</div>'
+      +'<button class="gbtn gbtn-gl gbtn-sm" style="padding:3px 8px;font-size:10px;color:var(--rd);" onclick="delE('+x.id+')">🗑️</button>'
       +'</div></div>';
   }).join('');
+}
+function delE(id){
+  if(!confirm('Delete this expense?'))return;
+  dbDel('expenses',id).then(function(){
+    allE=allE.filter(function(x){return x.id!==id;});
+    cDelete('expenses',id,{user_org:CU.orgKey});
+    renderE();loadDash();
+    toast('Deleted');
+  });
 }
 
 // ============================================================
@@ -842,40 +890,65 @@ function saveAtt(){
     var stEl=document.querySelector('input[name="a'+i+'"]:checked');
     return {n:name,st:stEl?stEl.value:'—',reason:document.getElementById('r'+i)?document.getElementById('r'+i).value:''};
   });
-  dbAdd('attendance',{b:b,d:d,sub:sub,recs:recs,user_org:CU.orgKey,user_name:CU.name}).then(function(){
-    cPost('attendance',{b:b,d:d,sub:sub,recs:recs,user_org:CU.orgKey,user_name:CU.name});
-    toast('✅ Attendance saved!');
-    loadAttHist();
+  var rec={b:b,d:d,sub:sub,recs:recs,user_org:CU.orgKey,user_name:CU.name};
+  dbAdd('attendance',rec).then(function(id){
+    rec.id=id;rec.external_id=id;
+    dbPut('attendance',rec).then(function(){
+      cPost('attendance',rec);
+      toast('✅ Attendance saved!');
+      loadAttHist();
+    });
   });
 }
+var allAttHist=[],attHistCache=[];
 function loadAttHist(){
   dbAll('attendance').then(function(all){
-    var el=document.getElementById('attHist');
-    if(!all.length){el.innerHTML='<div class="empty"><div class="emico">📋</div><div class="emtxt">No records yet</div></div>';return;}
-    el.innerHTML=all.slice().reverse().slice(0,8).map(function(a,idx){
-      var p=(a.recs||[]).filter(function(r){return r.st==='P';}).length;
-      var ab=(a.recs||[]).filter(function(r){return r.st==='A';}).length;
-      return '<div class="rc" style="margin-bottom:8px;">'
-        +'<div style="font-size:13px;font-weight:600;">'+a.b+' · '+a.d+(a.sub?' · '+a.sub:'')+'</div>'
-        +'<div style="display:flex;gap:8px;font-size:12px;margin-top:5px;">'
-        +'<span style="color:var(--tl);">✅ '+p+' Present</span>'
-        +'<span style="color:var(--rd);">❌ '+ab+' Absent</span>'
-        +'</div>'
-        +'<button class="gbtn gbtn-gl gbtn-sm" style="margin-top:8px;" onclick="shrAttIdx('+idx+')">📤 Share</button>'
-        +'</div>';
-    }).join('');
+    cGet('attendance').then(function(call){
+      allAttHist=mergeCloudLocal(all,call);
+      renderAttHist();
+    });
   });
 }
-var attHistCache=[];
-function shrAttIdx(idx){
-  dbAll('attendance').then(function(all){
-    attHistCache=all.slice().reverse();
-    var a=attHistCache[idx];
-    if(!a)return;
-    var t=buildAttendanceReportText(a);
-    if(navigator.share)navigator.share({title:'Attendance Report',text:t});
-    else{navigator.clipboard.writeText(t).then(function(){toast('Copied!');});}
+function renderAttHist(){
+  var el=document.getElementById('attHist');
+  var qEl=document.getElementById('attsrch');
+  var q=qEl?qEl.value.toLowerCase():'';
+  var list=allAttHist.slice().reverse();
+  if(q)list=list.filter(function(a){return ((a.b||'')+' '+(a.d||'')+' '+(a.sub||'')).toLowerCase().indexOf(q)>-1;});
+  attHistCache=list;
+  if(!list.length){el.innerHTML='<div class="empty"><div class="emico">📋</div><div class="emtxt">No records found</div></div>';return;}
+  el.innerHTML=list.slice(0,20).map(function(a,idx){
+    var p=(a.recs||[]).filter(function(r){return r.st==='P';}).length;
+    var ab=(a.recs||[]).filter(function(r){return r.st==='A';}).length;
+    return '<div class="rc" style="margin-bottom:8px;">'
+      +'<div style="font-size:13px;font-weight:600;">'+a.b+' · '+a.d+(a.sub?' · '+a.sub:'')+'</div>'
+      +'<div style="display:flex;gap:8px;font-size:12px;margin-top:5px;">'
+      +'<span style="color:var(--tl);">✅ '+p+' Present</span>'
+      +'<span style="color:var(--rd);">❌ '+ab+' Absent</span>'
+      +'</div>'
+      +'<div class="brow" style="margin-top:8px;">'
+      +'<button class="gbtn gbtn-gl gbtn-sm" onclick="shrAttIdx('+idx+')">📤 Share</button>'
+      +'<button class="gbtn gbtn-gl gbtn-sm" style="color:var(--rd);" onclick="delAtt('+idx+')">🗑️ Delete</button>'
+      +'</div></div>';
+  }).join('');
+}
+function delAtt(idx){
+  var a=attHistCache[idx];
+  if(!a)return;
+  if(!confirm('Delete this attendance record?'))return;
+  dbDel('attendance',a.id).then(function(){
+    allAttHist=allAttHist.filter(function(x){return x!==a;});
+    if(a.external_id!=null)cDelete('attendance',a.external_id,{user_org:CU.orgKey});
+    renderAttHist();
+    toast('Deleted');
   });
+}
+function shrAttIdx(idx){
+  var a=attHistCache[idx];
+  if(!a)return;
+  var t=buildAttendanceReportText(a);
+  if(navigator.share)navigator.share({title:'Attendance Report',text:t});
+  else{navigator.clipboard.writeText(t).then(function(){toast('Copied!');});}
 }
 function buildAttendanceReportText(a){
   var lines=[];
@@ -1547,14 +1620,57 @@ function saveSett(){
   initUI();toast('✅ Profile saved!');
 }
 function saveAI(){
-  localStorage.setItem('wrc_ai_svc',document.getElementById('aiSvc').value);
-  localStorage.setItem('wrc_ai_key',document.getElementById('aiK').value);
-  toast('✅ AI settings saved!');
+  localStorage.setItem('wrc_ai_svc','gemini');
+  localStorage.setItem('wrc_ai_key',document.getElementById('aiK').value.trim());
+  toast('✅ Gemini API key saved!');
 }
 function cpLink(){navigator.clipboard.writeText(window.location.href).then(function(){toast('✅ Link copied!');});}
 function shrLink(){
   if(navigator.share)navigator.share({title:'WRC Nepal Staff Tracker',url:window.location.href,text:'WRC Nepal Staff Tracker app'});
   else cpLink();
+}
+
+// ============================================================
+// GLOBAL SEARCH — across Visitors, Leads, Expenses, Attendance
+// ============================================================
+function globalSearch(inputId,resultsId){
+  inputId=inputId||'gsrchHome';
+  resultsId=resultsId||'gsrchResultsHome';
+  var inEl=document.getElementById(inputId);
+  var out=document.getElementById(resultsId);
+  if(!inEl||!out)return;
+  var q=inEl.value.trim().toLowerCase();
+  if(!q){out.innerHTML='';return;}
+  var results=[];
+  (allV||[]).forEach(function(v){
+    if(JSON.stringify(v).toLowerCase().indexOf(q)>-1){
+      results.push({type:'Visitor',icon:'👥',label:v.n,sub:(v.ph||v.ci||''),
+        action:"showSec('visitors');closeM('mldd');closeM('mvd');setTimeout(function(){showVD("+v.id+");},60);"});
+    }
+  });
+  (allLeads||[]).forEach(function(l){
+    if(JSON.stringify(l).toLowerCase().indexOf(q)>-1){
+      results.push({type:'Lead',icon:'🎯',label:l.n,sub:(l.ph||l.co||''),
+        action:"showSec('leads');setTimeout(function(){showLeadDetail("+l.id+");},60);"});
+    }
+  });
+  (allE||[]).forEach(function(e){
+    if(JSON.stringify(e).toLowerCase().indexOf(q)>-1){
+      results.push({type:'Expense',icon:'🧾',label:e.cat+' — '+(e.cur==='INR'?'₹':'रू')+e.amt,sub:(e.pur||e.df||''),
+        action:"showSec('expenses');"});
+    }
+  });
+  (allAttHist||[]).forEach(function(a){
+    if(((a.b||'')+' '+(a.d||'')+' '+(a.sub||'')).toLowerCase().indexOf(q)>-1){
+      results.push({type:'Attendance',icon:'📋',label:(a.b||'')+' · '+(a.d||''),sub:a.sub||'',
+        action:"showSec('attendance');"});
+    }
+  });
+  if(!results.length){out.innerHTML='<div class="empty" style="padding:16px;"><div class="emtxt">No matches found</div></div>';return;}
+  out.innerHTML=results.slice(0,30).map(function(r){
+    return '<div class="li" onclick="'+r.action.replace(/"/g,'&quot;')+'"><div class="liav" style="background:var(--s1);">'+r.icon+'</div>'
+      +'<div class="libody"><div class="liname">'+r.label+'</div><div class="limeta">'+r.type+(r.sub?' · '+r.sub:'')+'</div></div></div>';
+  }).join('');
 }
 
 // ============================================================
@@ -1575,35 +1691,16 @@ function aiQ(q){
   var adm=allV.filter(function(v){return v.st2==='Admitted';}).length;
   var ti=allE.reduce(function(s,x){return s+(x.cur==='INR'?+x.amt:+x.amt*N2I);},0);
   var key=localStorage.getItem('wrc_ai_key')||'';
-  var svc=localStorage.getItem('wrc_ai_svc')||'gemini';
   if(!key){
-    rp.innerHTML='📊 <b>Quick Summary:</b><br>Visitors: '+tot+' | Hot: '+hot+' | Admitted: '+adm+'<br>Expenses: ₹'+Math.round(ti).toLocaleString('en-IN')+'<br><br><em>Add AI key in Settings for detailed analysis!</em>';
+    rp.innerHTML='📊 <b>Quick Summary:</b><br>Visitors: '+tot+' | Hot: '+hot+' | Admitted: '+adm+'<br>Expenses: ₹'+Math.round(ti).toLocaleString('en-IN')+'<br><br><em>Add your free Gemini API key in Settings for detailed AI analysis!</em>';
     return;
   }
   var ctx='WRC Nepal Staff data - Visitors:'+tot+', Hot leads:'+hot+', Admitted:'+adm+', Total expenses INR:'+Math.round(ti)+'. Today:'+new Date().toLocaleDateString('en-IN')+'. Answer briefly.';
-  if(svc==='gemini'){
-    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key='+key,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:ctx+'\n\nQuestion: '+q}]}]})
-    }).then(function(r){return r.json();}).then(function(d){
-      var resp=d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts?d.candidates[0].content.parts[0].text:'No response';
-      rp.innerHTML=resp.replace(/\n/g,'<br>');
-    }).catch(function(){rp.innerHTML='⚠️ AI error. Check API key in Settings.';});
-  } else if(svc==='claude'){
-    fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-haiku-20240307',max_tokens:300,system:ctx,messages:[{role:'user',content:q}]})
-    }).then(function(r){return r.json();}).then(function(d){
-      rp.innerHTML=d.content&&d.content[0]?d.content[0].text.replace(/\n/g,'<br>'):'No response';
-    }).catch(function(){rp.innerHTML='⚠️ AI error. Check API key.';});
-  } else {
-    fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'gpt-3.5-turbo',max_tokens:300,messages:[{role:'system',content:ctx},{role:'user',content:q}]})
-    }).then(function(r){return r.json();}).then(function(d){
-      rp.innerHTML=d.choices&&d.choices[0]?d.choices[0].message.content.replace(/\n/g,'<br>'):'No response';
-    }).catch(function(){rp.innerHTML='⚠️ AI error. Check API key.';});
-  }
+  callGemini(ctx+'\n\nQuestion: '+q).then(function(resp){
+    rp.innerHTML=resp.replace(/\n/g,'<br>');
+  }).catch(function(err){
+    rp.innerHTML='⚠️ AI error: '+err+'. Check your Gemini API key in Settings.';
+  });
 }
 
 // ============================================================
@@ -1947,8 +2044,8 @@ function toggleVoiceRecord(){
 }
 function callGemini(prompt){
   var key=localStorage.getItem('wrc_ai_key')||'';
-  if(!key)return Promise.reject('add Gemini key in Settings');
-  return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key='+key,{
+  if(!key)return Promise.reject('add your free Gemini key in Settings');
+  return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+key,{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
   }).then(function(r){return r.json();}).then(function(d){
