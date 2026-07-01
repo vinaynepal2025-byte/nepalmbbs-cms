@@ -417,6 +417,7 @@ function loadDash(){
 // VISITORS
 // ============================================================
 var CLR=['#ff8fa3','#06d6a0','#b39dff','#ff9a5c','#4fc3f7','#ffd166'];
+var curShowVDRecord=null;
 var SM={'New':'bdg-pu','Interested':'bdg-tl','Hot lead':'bdg-or','Admitted':'bdg-tl','Not interested':'bdg-rd','Follow-up':'bdg-yl'};
 function renderVList(list){
   if(!list||!list.length)return '';
@@ -545,6 +546,7 @@ function showVD(id){
   dbAll('visitors').then(function(vs){
     var v=vs.find(function(x){return x.id===id;});
     if(!v)return;
+    curShowVDRecord=v;
     document.getElementById('vdtitle').innerHTML=v.n+' <button class="cbtn" onclick="closeM(\'mvd\')">✕</button>';
     var sm=SM[v.st2]||'bdg-pu';
     var ph=v.ph?v.ph.replace(/\D/g,''):'';
@@ -577,6 +579,7 @@ function showVD(id){
       +(ph?'<a href="https://wa.me/'+ph+'" target="_blank" class="gbtn gbtn-tl gbtn-sm">💬 WhatsApp</a>':'')
       +(ph?'<a href="tel:'+v.ph+'" class="gbtn gbtn-bl gbtn-sm">📞 Call</a>':'')
       +'<button class="gbtn gbtn-gl gbtn-sm" onclick="shrV('+id+')">📤 Share</button>'
+      +'<button class="gbtn gbtn-pu gbtn-sm" onclick="openReport(\'visitor\',curShowVDRecord)">📊 Report</button>'
       +'<button class="gbtn gbtn-gl gbtn-sm" style="color:var(--rd);" onclick="delV('+id+')">🗑️ Delete</button>'
       +'</div>';
     document.getElementById('vdbody').innerHTML=body;
@@ -785,7 +788,10 @@ function renderE(){
       +'<div class="lirght" style="align-items:flex-end;gap:4px;">'
       +'<div style="font-size:15px;font-weight:700;color:'+col+';">'+(x.cur==='INR'?'₹':'रू')+parseFloat(x.amt).toLocaleString()+'</div>'
       +'<div style="font-size:10px;color:var(--t3);">'+(x.cur==='INR'?'रू'+anpr+' NPR':'₹'+ainr+' INR')+'</div>'
+      +'<div style="display:flex;gap:5px;">'
+      +'<button class="gbtn gbtn-gl gbtn-sm" style="padding:3px 8px;font-size:10px;" onclick="openExpenseReport('+x.id+')">📊</button>'
       +'<button class="gbtn gbtn-gl gbtn-sm" style="padding:3px 8px;font-size:10px;color:var(--rd);" onclick="delE('+x.id+')">🗑️</button>'
+      +'</div>'
       +'</div></div>';
   }).join('');
 }
@@ -928,6 +934,7 @@ function renderAttHist(){
       +'</div>'
       +'<div class="brow" style="margin-top:8px;">'
       +'<button class="gbtn gbtn-gl gbtn-sm" onclick="shrAttIdx('+idx+')">📤 Share</button>'
+      +'<button class="gbtn gbtn-pu gbtn-sm" onclick="openAttReport('+idx+')">📊 Report</button>'
       +'<button class="gbtn gbtn-gl gbtn-sm" style="color:var(--rd);" onclick="delAtt('+idx+')">🗑️ Delete</button>'
       +'</div></div>';
   }).join('');
@@ -2315,6 +2322,131 @@ function sendLeadReportEmail(){
   var single=(window._ldReportLeads||[])[0];
   var to=single&&single.em?single.em:'';
   window.open('mailto:'+to+'?subject='+encodeURIComponent('Lead Report — '+(CU.org||'WRC Nepal'))+'&body='+encodeURIComponent(t),'_blank');
+}
+
+// ============================================================
+// UNIVERSAL REPORT STUDIO — Visitors / Attendance / Expenses
+// (Individual reports: manual + AI, view/edit/copy/export/WhatsApp/email)
+// ============================================================
+var reportCtx={type:null,record:null,manualText:''};
+
+function corpHeader(title){
+  var org=(CU.org||'WRC Nepal').toUpperCase();
+  return '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  '+org+'\n  '+title+'\n  '
+    +new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})
+    +'\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+}
+function corpFooter(){
+  return '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPrepared by: '+CU.name
+    +'\nOrganization: '+(CU.org||'WRC Nepal')
+    +'\nThis is a system-generated report from WRC Nepal Staff Tracker.';
+}
+function buildVisitorReportManual(v){
+  var lines=[corpHeader('VISITOR REPORT')];
+  lines.push('Name: '+v.n);
+  lines.push('Visitor Type: '+(v.vt||'-'));
+  lines.push('Visit Mode: '+(v.mode==='virtual'?'Virtual':'Physical'));
+  lines.push('Contact: '+(v.ph||'-'));
+  lines.push('Email: '+(v.em||'-'));
+  lines.push('Location: '+(v.mode==='virtual'?((v.vvCity||'')+' '+(v.vvState||'')):((v.cy||'')+' '+(v.st||''))));
+  lines.push('College Interest: '+(v.ci||'-'));
+  lines.push('Visit Date: '+(v.vd||'-'));
+  lines.push('Status: '+(v.st2||'New'));
+  lines.push('Reference: '+((v.rt||'')+(v.rn?' — '+v.rn:'')));
+  lines.push('NEET Status: '+(v.ns||'-'));
+  lines.push('Admission Plan: '+(v.ap||'-'));
+  lines.push('Documents: '+((v.doc||[]).join(', ')||'None'));
+  if(v.mq)lines.push('Queries: '+v.mq);
+  if(v.fd)lines.push('Follow-up Date: '+v.fd);
+  if(v.nt)lines.push('Notes: '+v.nt);
+  lines.push(corpFooter());
+  return lines.join('\n');
+}
+function buildAttendanceReportManual(a){
+  var lines=[corpHeader('ATTENDANCE REPORT')];
+  lines.push('Batch: '+a.b);
+  lines.push('Date: '+(a.d||'-'));
+  if(a.sub)lines.push('Subject: '+a.sub);
+  lines.push('');
+  var p=0,ab=0;
+  (a.recs||[]).forEach(function(r,i){
+    var status=r.st==='P'?'Present':r.st==='A'?'Absent':'-';
+    if(r.st==='P')p++;if(r.st==='A')ab++;
+    lines.push((i+1)+'. '+r.n+' — '+status+(r.reason?' ('+r.reason+')':''));
+  });
+  lines.push('');
+  lines.push('Total Present: '+p+' | Total Absent: '+ab);
+  lines.push(corpFooter());
+  return lines.join('\n');
+}
+function buildExpenseReportManual(x){
+  var lines=[corpHeader('EXPENSE REPORT')];
+  lines.push('Category: '+x.cat);
+  lines.push('Amount: '+(x.cur==='INR'?'₹':'रू')+parseFloat(x.amt).toLocaleString());
+  lines.push('Date: '+(x.df||'-')+(x.dt?' to '+x.dt:''));
+  if(x.pm)lines.push('Payment Mode: '+x.pm);
+  if(x.pur)lines.push('Purpose: '+x.pur);
+  if(x.rv)lines.push('Related Visitor: '+x.rv);
+  if(x.tm)lines.push('Transport Mode: '+x.tm);
+  if(x.fl)lines.push('From: '+x.fl);
+  if(x.tl)lines.push('To: '+x.tl);
+  if(x.hn)lines.push('Hotel: '+x.hn);
+  if((x.mt||[]).length)lines.push('Meals: '+x.mt.join(', '));
+  if(x.oth)lines.push('Details: '+x.oth);
+  lines.push(corpFooter());
+  return lines.join('\n');
+}
+function openReport(type,record){
+  reportCtx={type:type,record:record};
+  var title='',target='',manual='';
+  if(type==='visitor'){title='📊 Visitor Report';target='For: '+record.n;manual=buildVisitorReportManual(record);}
+  else if(type==='attendance'){title='📊 Attendance Report';target=record.b+' · '+record.d;manual=buildAttendanceReportManual(record);}
+  else if(type==='expense'){title='📊 Expense Report';target=record.cat+' — '+(record.cur==='INR'?'₹':'रू')+record.amt;manual=buildExpenseReportManual(record);}
+  reportCtx.manualText=manual;
+  document.getElementById('reportTitle').innerHTML=title+' <button class="cbtn" onclick="closeM(\'mreport\')">✕</button>';
+  document.getElementById('reportTargetLbl').textContent=target;
+  document.getElementById('reportText').value=manual;
+  openM('mreport');
+}
+function openExpenseReport(id){var x=allE.find(function(e){return e.id===id;});if(x)openReport('expense',x);}
+function openAttReport(idx){var a=attHistCache[idx];if(a)openReport('attendance',a);}
+function resetReportManual(){
+  document.getElementById('reportText').value=reportCtx.manualText;
+  toast('Reset to manual report');
+}
+function aiPolishReport(){
+  var ta=document.getElementById('reportText');
+  var original=ta.value;
+  ta.value='Thinking...';
+  var prompt='Rewrite the following data report into a polished, professional, corporate-style report suitable for sending to a colleague or client via WhatsApp/Email. Keep every factual detail exactly as given — do not invent or omit data — just improve structure, tone and formatting with clear section headers. Keep it reasonably concise.\n\n'+original;
+  callGemini(prompt).then(function(txt){ta.value=txt.trim();}).catch(function(err){ta.value=original;toast('AI unavailable ('+err+') — kept manual report',true);});
+}
+function copyReportText(){
+  var t=document.getElementById('reportText').value;
+  navigator.clipboard.writeText(t).then(function(){toast('✅ Report copied');});
+}
+function exportReportExcel(){
+  var r=reportCtx.record,type=reportCtx.type,rows=[];
+  if(type==='visitor'){rows=[{Name:r.n,Phone:r.ph,Email:r.em,College:r.ci,Status:r.st2,VisitDate:r.vd,Mode:r.mode}];}
+  else if(type==='attendance'){rows=(r.recs||[]).map(function(x){return {Batch:r.b,Date:r.d,Subject:r.sub||'',Student:x.n,Status:x.st,Reason:x.reason||''};});}
+  else if(type==='expense'){rows=[{Category:r.cat,Amount:r.amt,Currency:r.cur,Date:r.df,Purpose:r.pur||'',PaymentMode:r.pm||''}];}
+  var ws=XLSX.utils.json_to_sheet(rows);
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Report');
+  XLSX.writeFile(wb,'WRC_'+type+'_Report_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+function sendReportWA(){
+  var t=document.getElementById('reportText').value;
+  var r=reportCtx.record,type=reportCtx.type;
+  var ph=(type==='visitor'&&r.ph)?r.ph.replace(/\D/g,''):'';
+  window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(t),'_blank');
+}
+function sendReportEmail(){
+  var t=document.getElementById('reportText').value;
+  var r=reportCtx.record,type=reportCtx.type;
+  var to=(type==='visitor'&&r.em)?r.em:'';
+  var subj=(type==='visitor'?'Visitor':type==='attendance'?'Attendance':'Expense')+' Report — '+(CU.org||'WRC Nepal');
+  window.open('mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(t),'_blank');
 }
 
 // ============================================================

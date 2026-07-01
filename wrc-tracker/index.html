@@ -943,6 +943,24 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
   </div>
 </div></div>
 
+<!-- UNIVERSAL REPORT STUDIO -->
+<div class="mov" id="mreport"><div class="modal">
+  <div class="mhandle"></div>
+  <div class="mtitle" id="reportTitle">📊 Report <button class="cbtn" onclick="closeM('mreport')">✕</button></div>
+  <div style="font-size:11px;color:var(--t3);margin-bottom:10px;" id="reportTargetLbl">—</div>
+  <div class="brow" style="margin-bottom:4px;">
+    <button class="gbtn gbtn-bl gbtn-sm" onclick="aiPolishReport()">✨ AI Professional Rewrite</button>
+    <button class="gbtn gbtn-gl gbtn-sm" onclick="resetReportManual()">↺ Reset to Manual</button>
+  </div>
+  <div class="fld"><label>Report (view &amp; edit freely)</label><textarea class="gta" id="reportText" style="min-height:280px;"></textarea></div>
+  <div class="brow">
+    <button class="gbtn gbtn-tl gbtn-sm" onclick="copyReportText()">📋 Copy</button>
+    <button class="gbtn gbtn-pu gbtn-sm" onclick="exportReportExcel()">📥 Export Excel</button>
+    <button class="gbtn gbtn-gl gbtn-sm" onclick="sendReportWA()">💬 WhatsApp</button>
+    <button class="gbtn gbtn-or gbtn-sm" onclick="sendReportEmail()">✉️ Email</button>
+  </div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
