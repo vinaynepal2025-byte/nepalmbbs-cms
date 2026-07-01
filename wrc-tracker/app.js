@@ -103,7 +103,7 @@ function dbDel(store,id){
 // ============================================================
 function cGet(table,extra){
   extra=extra||'';
-  return fetch(SU+'/rest/v1/'+table+'?order=ts.desc'+extra,{
+  return fetch(SU+'/rest/v1/'+table+'?order=created_at.desc'+extra,{
     headers:{'apikey':SK,'Authorization':'Bearer '+SK}
   }).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
 }
