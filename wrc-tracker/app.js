@@ -1713,9 +1713,8 @@ function normPhone(p){return (p||'').replace(/[^0-9]/g,'').slice(-10);}
 
 function loadLeads(){
   dbAll('leads').then(function(l){
-    allLeads=l;
     cGet('leads').then(function(cl){
-      if(cl&&cl.length>allLeads.length)allLeads=cl;
+      allLeads=mergeCloudLocal(l,cl).filter(function(x){return x.n;});
       renderLeads();
       var el=document.getElementById('ld1');if(el)el.textContent=allLeads.length;
       updateSentTodayCount();
@@ -1924,6 +1923,7 @@ function showLeadDetail(id){
     +'<button class="gbtn gbtn-pu gbtn-sm" onclick="openCallSummary('+id+')">📞 Call Summary</button>'
     +'<button class="gbtn gbtn-or gbtn-sm" onclick="openMediaShare('+id+')">📎 Share Media</button>'
     +'<button class="gbtn gbtn-gl gbtn-sm" onclick="openMeetLink('+id+')">🎥 Meeting Link</button>'
+    +'<button class="gbtn gbtn-gl gbtn-sm" style="color:var(--rd);" onclick="delLead('+id+')">🗑️ Delete</button>'
     +'</div>'
     +'<div class="dvdr"></div>'
     +'<div class="sht" style="margin-bottom:8px;">🗂️ Activity Timeline</div>'
@@ -1941,6 +1941,16 @@ function updateLeadStatus(id){
   cPatch('leads',{external_id:id,user_org:CU.orgKey},{st:st});
   toast('✅ Status updated');
   renderLeads();
+}
+function delLead(id){
+  if(!confirm('Delete this lead?'))return;
+  dbDel('leads',id).then(function(){
+    allLeads=allLeads.filter(function(x){return x.id!==id;});
+    cDelete('leads',id,{user_org:CU.orgKey});
+    closeM('mldd');renderLeads();
+    var el=document.getElementById('ld1');if(el)el.textContent=allLeads.length;
+    toast('Deleted');
+  });
 }
 
 // ---- Activity logging & timeline ----
