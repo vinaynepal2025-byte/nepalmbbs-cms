@@ -397,6 +397,81 @@ function showSec(name,navEl){
 // ============================================================
 // DASHBOARD
 // ============================================================
+// ============================================================
+// VISITOR PHOTO CAPTURE + DOCUMENT UPLOAD (compressed, stored inline)
+// ============================================================
+function compressImage(file,maxDim,quality){
+  return new Promise(function(resolve,reject){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var img=new Image();
+      img.onload=function(){
+        var w=img.width,h=img.height;
+        if(w>h){if(w>maxDim){h=Math.round(h*maxDim/w);w=maxDim;}}
+        else{if(h>maxDim){w=Math.round(w*maxDim/h);h=maxDim;}}
+        var canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=function(){reject('image load failed');};
+      img.src=e.target.result;
+    };
+    reader.onerror=function(){reject('file read failed');};
+    reader.readAsDataURL(file);
+  });
+}
+var vPhotoData=null,vDocsData=[];
+function handleVisitorPhoto(event){
+  var f=event.target.files[0];
+  if(!f)return;
+  compressImage(f,600,0.6).then(function(dataUrl){
+    vPhotoData=dataUrl;
+    var img=document.getElementById('vPhotoPreview');
+    img.src=dataUrl;img.style.display='block';
+    document.getElementById('vPhotoTxt').textContent='✓ Photo captured';
+  }).catch(function(){toast('Could not process photo',true);});
+}
+function handleVisitorDocs(event){
+  var files=Array.prototype.slice.call(event.target.files||[]);
+  if(!files.length)return;
+  Promise.all(files.map(function(f){return compressImage(f,1000,0.55);})).then(function(dataUrls){
+    vDocsData=vDocsData.concat(dataUrls);
+    renderDocsPreview();
+    document.getElementById('vDocsTxt').textContent='✓ '+vDocsData.length+' document(s) attached';
+  }).catch(function(){toast('Could not process documents',true);});
+  event.target.value='';
+}
+function renderDocsPreview(){
+  var el=document.getElementById('vDocsPreview');
+  if(!el)return;
+  el.innerHTML=vDocsData.map(function(d,i){
+    return '<div style="position:relative;"><img src="'+d+'" style="width:50px;height:50px;border-radius:8px;object-fit:cover;border:1px solid var(--b);">'
+      +'<span onclick="removeVDoc('+i+')" style="position:absolute;top:-6px;right:-6px;background:var(--rd);color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</span></div>';
+  }).join('');
+}
+function removeVDoc(i){
+  vDocsData.splice(i,1);
+  renderDocsPreview();
+  var t=document.getElementById('vDocsTxt');
+  if(t)t.textContent=vDocsData.length?('✓ '+vDocsData.length+' document(s) attached'):'Tap to upload document photos (marksheet, ID, etc.)';
+}
+function resetVisitorMedia(){
+  vPhotoData=null;vDocsData=[];
+  var img=document.getElementById('vPhotoPreview');if(img){img.style.display='none';img.src='';}
+  var pt=document.getElementById('vPhotoTxt');if(pt)pt.textContent='Tap to capture a photo';
+  var dt=document.getElementById('vDocsTxt');if(dt)dt.textContent='Tap to upload document photos (marksheet, ID, etc.)';
+  var dp=document.getElementById('vDocsPreview');if(dp)dp.innerHTML='';
+}
+function dataUrlToBlob(dataUrl){
+  var parts=dataUrl.split(',');
+  var mime=parts[0].match(/:(.*?);/)[1];
+  var bin=atob(parts[1]);
+  var arr=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+
 function loadDash(){
   Promise.all([dbAll('visitors'),dbAll('expenses'),dbAll('attendance')]).then(function(results){
     var v=results[0],e=results[1],a=results[2];
@@ -417,6 +492,7 @@ function loadDash(){
 // VISITORS
 // ============================================================
 var CLR=['#ff8fa3','#06d6a0','#b39dff','#ff9a5c','#4fc3f7','#ffd166'];
+var curShowVDRecord=null;
 var SM={'New':'bdg-pu','Interested':'bdg-tl','Hot lead':'bdg-or','Admitted':'bdg-tl','Not interested':'bdg-rd','Follow-up':'bdg-yl'};
 function renderVList(list){
   if(!list||!list.length)return '';
@@ -501,6 +577,8 @@ function saveV(){
     st2:document.getElementById('vst2').value,
     fd:document.getElementById('vfd').value,
     nt:document.getElementById('vnt').value,
+    photo:vPhotoData||'',
+    docFiles:vDocsData.slice(),
     user_org:CU.orgKey,
     user_name:CU.name
   };
@@ -539,12 +617,14 @@ function clearVForm(){
     var el=document.getElementById(id);if(el)el.value='';
   });
   document.querySelectorAll('#mav .chi').forEach(function(c){c.checked=false;});
+  resetVisitorMedia();
   setVisitMode('physical');
 }
 function showVD(id){
   dbAll('visitors').then(function(vs){
     var v=vs.find(function(x){return x.id===id;});
     if(!v)return;
+    curShowVDRecord=v;
     document.getElementById('vdtitle').innerHTML=v.n+' <button class="cbtn" onclick="closeM(\'mvd\')">✕</button>';
     var sm=SM[v.st2]||'bdg-pu';
     var ph=v.ph?v.ph.replace(/\D/g,''):'';
@@ -553,7 +633,8 @@ function showVD(id){
         +'<div class="rr"><span class="rk">🎥 Platform</span><span class="rv">'+(v.platform||'—')+'</span></div>'
         +'<div class="rr"><span class="rk">⏱️ Duration</span><span class="rv">'+(v.vvDuration||'—')+' min</span></div>'
       : '<div class="rr"><span class="rk">📍 Location</span><span class="rv">'+(v.cy||'')+' '+(v.st||'')+'</span></div>';
-    var body='<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;">'
+    var body=(v.photo?'<div style="text-align:center;margin-bottom:12px;"><img src="'+v.photo+'" style="width:96px;height:96px;border-radius:16px;object-fit:cover;border:2px solid var(--b2);box-shadow:0 4px 16px rgba(120,105,180,0.15);"></div>':'')
+      +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;">'
       +'<span class="bdg '+sm+'">'+(v.st2||'New')+'</span>'
       +'<span class="bdg bdg-yl">'+(v.mode==='virtual'?'🎥 Virtual':'🏫 Physical')+'</span>'
       +(v.vt?'<span class="bdg bdg-pu">'+v.vt+'</span>':'')
@@ -573,10 +654,12 @@ function showVD(id){
       +'<div class="rr"><span class="rk">💬 Queries</span><span class="rv" style="max-width:55%;text-align:right;font-size:11px;">'+(v.mq||'—')+'</span></div>'
       +(v.fd?'<div class="rr"><span class="rk">⏰ Follow-up</span><span class="rv" style="color:var(--yl);">'+v.fd+'</span></div>':'')
       +'</div>'
+      +((v.docFiles&&v.docFiles.length)?('<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'+v.docFiles.map(function(d){return '<img src="'+d+'" style="width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--b);">';}).join('')+'</div>'):'')
       +'<div class="brow">'
       +(ph?'<a href="https://wa.me/'+ph+'" target="_blank" class="gbtn gbtn-tl gbtn-sm">💬 WhatsApp</a>':'')
       +(ph?'<a href="tel:'+v.ph+'" class="gbtn gbtn-bl gbtn-sm">📞 Call</a>':'')
       +'<button class="gbtn gbtn-gl gbtn-sm" onclick="shrV('+id+')">📤 Share</button>'
+      +'<button class="gbtn gbtn-pu gbtn-sm" onclick="openReport(\'visitor\',curShowVDRecord)">📊 Report</button>'
       +'<button class="gbtn gbtn-gl gbtn-sm" style="color:var(--rd);" onclick="delV('+id+')">🗑️ Delete</button>'
       +'</div>';
     document.getElementById('vdbody').innerHTML=body;
@@ -785,7 +868,10 @@ function renderE(){
       +'<div class="lirght" style="align-items:flex-end;gap:4px;">'
       +'<div style="font-size:15px;font-weight:700;color:'+col+';">'+(x.cur==='INR'?'₹':'रू')+parseFloat(x.amt).toLocaleString()+'</div>'
       +'<div style="font-size:10px;color:var(--t3);">'+(x.cur==='INR'?'रू'+anpr+' NPR':'₹'+ainr+' INR')+'</div>'
+      +'<div style="display:flex;gap:5px;">'
+      +'<button class="gbtn gbtn-gl gbtn-sm" style="padding:3px 8px;font-size:10px;" onclick="openExpenseReport('+x.id+')">📊</button>'
       +'<button class="gbtn gbtn-gl gbtn-sm" style="padding:3px 8px;font-size:10px;color:var(--rd);" onclick="delE('+x.id+')">🗑️</button>'
+      +'</div>'
       +'</div></div>';
   }).join('');
 }
@@ -928,6 +1014,7 @@ function renderAttHist(){
       +'</div>'
       +'<div class="brow" style="margin-top:8px;">'
       +'<button class="gbtn gbtn-gl gbtn-sm" onclick="shrAttIdx('+idx+')">📤 Share</button>'
+      +'<button class="gbtn gbtn-pu gbtn-sm" onclick="openAttReport('+idx+')">📊 Report</button>'
       +'<button class="gbtn gbtn-gl gbtn-sm" style="color:var(--rd);" onclick="delAtt('+idx+')">🗑️ Delete</button>'
       +'</div></div>';
   }).join('');
@@ -993,11 +1080,13 @@ function shareAtt(){
 function loadRep(type){
   var el=document.getElementById('rpc');
   el.innerHTML='<div class="loading"><span class="spin"></span>Loading...</div>';
-  Promise.all([dbAll('visitors'),dbAll('expenses'),dbAll('attendance')]).then(function(res){
-    var v=res[0],e=res[1],a=res[2];
+  if(type==='f'){renderFinalReportBuilder();return;}
+  Promise.all([dbAll('visitors'),dbAll('expenses'),dbAll('attendance'),dbAll('leads')]).then(function(res){
+    var v=res[0],e=res[1],a=res[2],l=res[3];
     allV=v;allE=e;
     if(type==='v')renderVisitorReport(v);
     else if(type==='e')renderExpenseReport(e);
+    else if(type==='l')renderLeadsReport(l);
     else renderAttendanceReport(a);
   });
 }
@@ -1006,6 +1095,48 @@ function rpTab(t,el){
   el.classList.add('active');
   loadRep(t);
 }
+function renderFinalReportBuilder(){
+  var el=document.getElementById('rpc');
+  el.innerHTML='<div class="gc">'
+    +'<div style="font-size:13px;font-weight:700;margin-bottom:10px;">✨ Build Your Final Custom Report</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-bottom:12px;">Select which sections to include, then generate one combined report — editable, AI-customizable, and shareable via WhatsApp/Email.</div>'
+    +'<label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;"><input type="checkbox" id="frVisitors" checked> 👥 Visitors Summary</label>'
+    +'<label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;"><input type="checkbox" id="frLeads" checked> 🎯 Leads Summary</label>'
+    +'<label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;"><input type="checkbox" id="frAttendance" checked> 📋 Attendance Summary</label>'
+    +'<label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;"><input type="checkbox" id="frExpenses" checked> 💰 Expenses Summary</label>'
+    +'<button class="gbtn gbtn-pu gbtn-full" onclick="generateFinalReport()">✨ Generate Final Report</button>'
+    +'</div>';
+}
+function generateFinalReport(){
+  var wantV=document.getElementById('frVisitors').checked;
+  var wantL=document.getElementById('frLeads').checked;
+  var wantA=document.getElementById('frAttendance').checked;
+  var wantE=document.getElementById('frExpenses').checked;
+  if(!wantV&&!wantL&&!wantA&&!wantE){toast('Kam se kam ek section select karo',true);return;}
+  Promise.all([dbAll('visitors'),dbAll('leads'),dbAll('attendance'),dbAll('expenses')]).then(function(res){
+    var v=res[0],l=res[1],a=res[2],e=res[3];
+    var parts=[corpHeader('FINAL COMBINED REPORT')];
+    if(wantV){
+      var tot=v.length,adm=v.filter(function(x){return x.st2==='Admitted';}).length,hot=v.filter(function(x){return x.st2==='Hot lead';}).length;
+      parts.push('── VISITORS ──\nTotal: '+tot+' | Admitted: '+adm+' | Hot Leads: '+hot+' | Conversion: '+(tot?Math.round(adm/tot*100):0)+'%\n');
+    }
+    if(wantL){
+      var byStatus={};l.forEach(function(x){var s=x.st||'New';byStatus[s]=(byStatus[s]||0)+1;});
+      parts.push('── LEADS ──\nTotal: '+l.length+'\n'+Object.keys(byStatus).map(function(k){return k+': '+byStatus[k];}).join(' | ')+'\n');
+    }
+    if(wantA){
+      var totalP=0,totalAb=0;a.forEach(function(x){(x.recs||[]).forEach(function(r){if(r.st==='P')totalP++;if(r.st==='A')totalAb++;});});
+      parts.push('── ATTENDANCE ──\nSessions Recorded: '+a.length+' | Total Present marks: '+totalP+' | Total Absent marks: '+totalAb+'\n');
+    }
+    if(wantE){
+      var ti=e.reduce(function(s,x){return s+(x.cur==='INR'?+x.amt:+x.amt*N2I);},0);
+      parts.push('── EXPENSES ──\nTotal Records: '+e.length+' | Total: ₹'+Math.round(ti).toLocaleString('en-IN')+'\n');
+    }
+    parts.push(corpFooter());
+    openReport('combined',{label:'Final Combined Report',text:parts.join('\n')});
+  });
+}
+
 function renderVisitorReport(v){
   var el=document.getElementById('rpc');
   var tot=v.length,adm=v.filter(function(x){return x.st2==='Admitted';}).length;
@@ -1063,6 +1194,58 @@ function dlVisitorsCSV(){
   var rows=allV.map(function(x){return cols.map(function(c){return '"'+(x[c]||'').toString().replace(/"/g,"'")+'"';}).join(',');});
   var csv=hdrs+'\n'+rows.join('\n');
   downloadCSV(csv,'WRC_Visitors_'+new Date().toISOString().slice(0,10)+'.csv');
+}
+
+function renderLeadsReport(l){
+  var el=document.getElementById('rpc');
+  var tot=l.length;
+  var byStatus={};
+  l.forEach(function(x){var s=x.st||'New';byStatus[s]=(byStatus[s]||0)+1;});
+  var statusRows=Object.keys(byStatus).map(function(k){
+    return '<div class="rr"><span class="rk">'+k+'</span><span class="rv">'+byStatus[k]+'</span></div>';
+  }).join('');
+  var bySrc={};
+  l.forEach(function(x){var s=x.src||'Manual';bySrc[s]=(bySrc[s]||0)+1;});
+  var srcRows=Object.keys(bySrc).map(function(k){
+    return '<div class="rr"><span class="rk">'+k+'</span><span class="rv">'+bySrc[k]+'</span></div>';
+  }).join('');
+  el.innerHTML='<div class="rc"><div class="rr"><span class="rk">Total Leads</span><span class="rv" style="color:var(--pu);">'+tot+'</span></div>'+statusRows+'</div>'
+    +'<div class="rc"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">By Source</div>'+(srcRows||'<div class="emtxt">No data</div>')+'</div>'
+    +'<div class="sh"><div class="sht">Generate Full Report</div></div>'
+    +'<div class="srow">'
+    +'<div class="sbtn" onclick="shrLeadsReport(\'wa\')"><div class="sico2" style="background:rgba(37,211,102,0.15);">💬</div><div class="slbl2">WhatsApp</div></div>'
+    +'<div class="sbtn" onclick="shrLeadsReport(\'em\')"><div class="sico2">📧</div><div class="slbl2">Email</div></div>'
+    +'<div class="sbtn" onclick="shrLeadsReport(\'cp\')"><div class="sico2">📋</div><div class="slbl2">Copy</div></div>'
+    +'<div class="sbtn" onclick="dlLeadsCSV()"><div class="sico2" style="background:rgba(179,157,255,0.15);">⬇️</div><div class="slbl2">CSV</div></div>'
+    +'</div>';
+  window._repLeads=l;
+}
+function buildLeadsReportText(l){
+  var lines=[];
+  lines.push('*WRC NEPAL — LEADS SUMMARY REPORT*');
+  lines.push('Date: '+new Date().toLocaleDateString('en-IN'));
+  lines.push('================================');
+  lines.push('Total Leads: '+l.length);
+  lines.push('================================');
+  lines.push('');
+  l.slice().reverse().forEach(function(x,i){
+    lines.push((i+1)+'. '+x.n+' — '+(x.ph||'-')+' — '+(x.st||'New')+' — '+(x.src||'Manual'));
+  });
+  lines.push('');
+  lines.push('Generated by: '+CU.name+' | '+CU.org);
+  return lines.join('\n');
+}
+function shrLeadsReport(via){
+  var t=buildLeadsReportText(window._repLeads||[]);
+  doShare(via,'WRC Leads Report',t);
+}
+function dlLeadsCSV(){
+  var l=window._repLeads||[];
+  var cols=['n','ph','em','co','st','src','nt'];
+  var hdrs='Name,Phone,Email,College,Status,Source,Notes';
+  var rows=l.map(function(x){return cols.map(function(c){return '"'+(x[c]||'').toString().replace(/"/g,"'")+'"';}).join(',');});
+  var csv=hdrs+'\n'+rows.join('\n');
+  downloadCSV(csv,'WRC_Leads_'+new Date().toISOString().slice(0,10)+'.csv');
 }
 
 function renderExpenseReport(e){
@@ -2315,6 +2498,167 @@ function sendLeadReportEmail(){
   var single=(window._ldReportLeads||[])[0];
   var to=single&&single.em?single.em:'';
   window.open('mailto:'+to+'?subject='+encodeURIComponent('Lead Report — '+(CU.org||'WRC Nepal'))+'&body='+encodeURIComponent(t),'_blank');
+}
+
+// ============================================================
+// UNIVERSAL REPORT STUDIO — Visitors / Attendance / Expenses
+// (Individual reports: manual + AI, view/edit/copy/export/WhatsApp/email)
+// ============================================================
+var reportCtx={type:null,record:null,manualText:''};
+
+function corpHeader(title){
+  var org=(CU.org||'WRC Nepal').toUpperCase();
+  return '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  '+org+'\n  '+title+'\n  '
+    +new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})
+    +'\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+}
+function corpFooter(){
+  return '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPrepared by: '+CU.name
+    +'\nOrganization: '+(CU.org||'WRC Nepal')
+    +'\nThis is a system-generated report from WRC Nepal Staff Tracker.';
+}
+function buildVisitorReportManual(v){
+  var lines=[corpHeader('VISITOR REPORT')];
+  lines.push('Name: '+v.n);
+  lines.push('Visitor Type: '+(v.vt||'-'));
+  lines.push('Visit Mode: '+(v.mode==='virtual'?'Virtual':'Physical'));
+  lines.push('Contact: '+(v.ph||'-'));
+  lines.push('Email: '+(v.em||'-'));
+  lines.push('Location: '+(v.mode==='virtual'?((v.vvCity||'')+' '+(v.vvState||'')):((v.cy||'')+' '+(v.st||''))));
+  lines.push('College Interest: '+(v.ci||'-'));
+  lines.push('Visit Date: '+(v.vd||'-'));
+  lines.push('Status: '+(v.st2||'New'));
+  lines.push('Reference: '+((v.rt||'')+(v.rn?' — '+v.rn:'')));
+  lines.push('NEET Status: '+(v.ns||'-'));
+  lines.push('Admission Plan: '+(v.ap||'-'));
+  lines.push('Documents: '+((v.doc||[]).join(', ')||'None'));
+  if(v.mq)lines.push('Queries: '+v.mq);
+  if(v.fd)lines.push('Follow-up Date: '+v.fd);
+  if(v.nt)lines.push('Notes: '+v.nt);
+  lines.push(corpFooter());
+  return lines.join('\n');
+}
+function buildAttendanceReportManual(a){
+  var lines=[corpHeader('ATTENDANCE REPORT')];
+  lines.push('Batch: '+a.b);
+  lines.push('Date: '+(a.d||'-'));
+  if(a.sub)lines.push('Subject: '+a.sub);
+  lines.push('');
+  var p=0,ab=0;
+  (a.recs||[]).forEach(function(r,i){
+    var status=r.st==='P'?'Present':r.st==='A'?'Absent':'-';
+    if(r.st==='P')p++;if(r.st==='A')ab++;
+    lines.push((i+1)+'. '+r.n+' — '+status+(r.reason?' ('+r.reason+')':''));
+  });
+  lines.push('');
+  lines.push('Total Present: '+p+' | Total Absent: '+ab);
+  lines.push(corpFooter());
+  return lines.join('\n');
+}
+function buildExpenseReportManual(x){
+  var lines=[corpHeader('EXPENSE REPORT')];
+  lines.push('Category: '+x.cat);
+  lines.push('Amount: '+(x.cur==='INR'?'₹':'रू')+parseFloat(x.amt).toLocaleString());
+  lines.push('Date: '+(x.df||'-')+(x.dt?' to '+x.dt:''));
+  if(x.pm)lines.push('Payment Mode: '+x.pm);
+  if(x.pur)lines.push('Purpose: '+x.pur);
+  if(x.rv)lines.push('Related Visitor: '+x.rv);
+  if(x.tm)lines.push('Transport Mode: '+x.tm);
+  if(x.fl)lines.push('From: '+x.fl);
+  if(x.tl)lines.push('To: '+x.tl);
+  if(x.hn)lines.push('Hotel: '+x.hn);
+  if((x.mt||[]).length)lines.push('Meals: '+x.mt.join(', '));
+  if(x.oth)lines.push('Details: '+x.oth);
+  lines.push(corpFooter());
+  return lines.join('\n');
+}
+function openReport(type,record){
+  reportCtx={type:type,record:record};
+  var title='',target='',manual='';
+  if(type==='visitor'){title='📊 Visitor Report';target='For: '+record.n;manual=buildVisitorReportManual(record);}
+  else if(type==='attendance'){title='📊 Attendance Report';target=record.b+' · '+record.d;manual=buildAttendanceReportManual(record);}
+  else if(type==='expense'){title='📊 Expense Report';target=record.cat+' — '+(record.cur==='INR'?'₹':'रू')+record.amt;manual=buildExpenseReportManual(record);}
+  else if(type==='combined'){title='✨ Final Combined Report';target=record.label||'Custom Selection';manual=record.text;}
+  reportCtx.manualText=manual;
+  document.getElementById('reportTitle').innerHTML=title+' <button class="cbtn" onclick="closeM(\'mreport\')">✕</button>';
+  document.getElementById('reportTargetLbl').textContent=target;
+  document.getElementById('reportText').value=manual;
+  var photoWrap=document.getElementById('reportPhotoWrap');
+  if(type==='visitor'&&record.photo){
+    document.getElementById('reportPhoto').src=record.photo;
+    photoWrap.style.display='block';
+  } else {
+    photoWrap.style.display='none';
+  }
+  openM('mreport');
+}
+function openExpenseReport(id){var x=allE.find(function(e){return e.id===id;});if(x)openReport('expense',x);}
+function openAttReport(idx){var a=attHistCache[idx];if(a)openReport('attendance',a);}
+function resetReportManual(){
+  document.getElementById('reportText').value=reportCtx.manualText;
+  toast('Reset to manual report');
+}
+function aiCustomizeReport(){
+  var instrEl=document.getElementById('aiReportInstruction');
+  var instruction=instrEl.value.trim();
+  if(!instruction){toast('Pehle ye batao ki AI se kya customize karwana hai',true);return;}
+  var ta=document.getElementById('reportText');
+  var original=ta.value;
+  ta.value='Thinking...';
+  var prompt='Here is a report:\n\n'+original+'\n\nApply this specific instruction from the user and return the FULL updated report (not just the changed part): '+instruction;
+  callGemini(prompt).then(function(txt){
+    ta.value=txt.trim();
+    instrEl.value='';
+    toast('✅ Report updated by Gemini');
+  }).catch(function(err){
+    ta.value=original;
+    toast('AI unavailable ('+err+') — check your Gemini key in Settings',true);
+  });
+}
+function aiPolishReport(){
+  var ta=document.getElementById('reportText');
+  var original=ta.value;
+  ta.value='Thinking...';
+  var prompt='Rewrite the following data report into a polished, professional, corporate-style report suitable for sending to a colleague or client via WhatsApp/Email. Keep every factual detail exactly as given — do not invent or omit data — just improve structure, tone and formatting with clear section headers. Keep it reasonably concise.\n\n'+original;
+  callGemini(prompt).then(function(txt){ta.value=txt.trim();}).catch(function(err){ta.value=original;toast('AI unavailable ('+err+') — kept manual report',true);});
+}
+function copyReportText(){
+  var t=document.getElementById('reportText').value;
+  navigator.clipboard.writeText(t).then(function(){toast('✅ Report copied');});
+}
+function exportReportExcel(){
+  var r=reportCtx.record,type=reportCtx.type,rows=[];
+  if(type==='visitor'){rows=[{Name:r.n,Phone:r.ph,Email:r.em,College:r.ci,Status:r.st2,VisitDate:r.vd,Mode:r.mode}];}
+  else if(type==='attendance'){rows=(r.recs||[]).map(function(x){return {Batch:r.b,Date:r.d,Subject:r.sub||'',Student:x.n,Status:x.st,Reason:x.reason||''};});}
+  else if(type==='expense'){rows=[{Category:r.cat,Amount:r.amt,Currency:r.cur,Date:r.df,Purpose:r.pur||'',PaymentMode:r.pm||''}];}
+  else if(type==='combined'){rows=document.getElementById('reportText').value.split('\n').map(function(line){return {Line:line};});}
+  var ws=XLSX.utils.json_to_sheet(rows);
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Report');
+  XLSX.writeFile(wb,'WRC_'+type+'_Report_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+function sendReportWA(){
+  var t=document.getElementById('reportText').value;
+  var r=reportCtx.record,type=reportCtx.type;
+  var ph=(type==='visitor'&&r.ph)?r.ph.replace(/\D/g,''):'';
+  if(type==='visitor'&&r.photo&&navigator.share&&navigator.canShare){
+    try{
+      var blob=dataUrlToBlob(r.photo);
+      var file=new File([blob],'visitor_photo.jpg',{type:'image/jpeg'});
+      if(navigator.canShare({files:[file]})){
+        navigator.share({files:[file],text:t,title:'Visitor Report'}).catch(function(){});
+        return;
+      }
+    }catch(e){}
+  }
+  window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(t),'_blank');
+}
+function sendReportEmail(){
+  var t=document.getElementById('reportText').value;
+  var r=reportCtx.record,type=reportCtx.type;
+  var to=(type==='visitor'&&r.em)?r.em:'';
+  var subj=(type==='visitor'?'Visitor':type==='attendance'?'Attendance':'Expense')+' Report — '+(CU.org||'WRC Nepal');
+  window.open('mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(t),'_blank');
 }
 
 // ============================================================
