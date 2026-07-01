@@ -952,6 +952,13 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
     <button class="gbtn gbtn-bl gbtn-sm" onclick="aiPolishReport()">✨ AI Professional Rewrite</button>
     <button class="gbtn gbtn-gl gbtn-sm" onclick="resetReportManual()">↺ Reset to Manual</button>
   </div>
+  <div class="fld" style="margin-bottom:8px;">
+    <label>🤖 Ask Gemini to customize this report</label>
+    <div style="display:flex;gap:8px;">
+      <input class="gi" id="aiReportInstruction" placeholder="e.g. isko chhota karo / add a follow-up section...">
+      <button class="gbtn gbtn-pu gbtn-sm" onclick="aiCustomizeReport()">➤</button>
+    </div>
+  </div>
   <div class="fld"><label>Report (view &amp; edit freely)</label><textarea class="gta" id="reportText" style="min-height:280px;"></textarea></div>
   <div class="brow">
     <button class="gbtn gbtn-tl gbtn-sm" onclick="copyReportText()">📋 Copy</button>

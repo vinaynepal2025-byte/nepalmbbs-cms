@@ -2414,6 +2414,23 @@ function resetReportManual(){
   document.getElementById('reportText').value=reportCtx.manualText;
   toast('Reset to manual report');
 }
+function aiCustomizeReport(){
+  var instrEl=document.getElementById('aiReportInstruction');
+  var instruction=instrEl.value.trim();
+  if(!instruction){toast('Pehle ye batao ki AI se kya customize karwana hai',true);return;}
+  var ta=document.getElementById('reportText');
+  var original=ta.value;
+  ta.value='Thinking...';
+  var prompt='Here is a report:\n\n'+original+'\n\nApply this specific instruction from the user and return the FULL updated report (not just the changed part): '+instruction;
+  callGemini(prompt).then(function(txt){
+    ta.value=txt.trim();
+    instrEl.value='';
+    toast('✅ Report updated by Gemini');
+  }).catch(function(err){
+    ta.value=original;
+    toast('AI unavailable ('+err+') — check your Gemini key in Settings',true);
+  });
+}
 function aiPolishReport(){
   var ta=document.getElementById('reportText');
   var original=ta.value;
