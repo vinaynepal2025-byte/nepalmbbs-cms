@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="WRC Tracker">
 <meta name="theme-color" content="#f3f0fb">
 <link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="96x96" href="./icon-96.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <title>WRC Nepal Staff Tracker</title>
 <style>
 :root{--bg:#f3f0fb;--s1:rgba(255,255,255,0.55);--s2:rgba(255,255,255,0.8);--b:rgba(120,105,180,0.16);--b2:rgba(120,105,180,0.32);--tx:#241f3d;--t2:rgba(36,31,61,0.68);--t3:rgba(36,31,61,0.46);--pk:#ff5fa2;--or:#ff8a4c;--yl:#e8a916;--tl:#06b389;--bl:#2f95e0;--pu:#8467f0;--rd:#e94f4f;--wred:#b71c2c;--r:20px;--rs:14px;--rx:10px}
@@ -161,6 +163,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 .vtoggle{display:flex;gap:8px;margin-bottom:4px}
 .vtbtn{flex:1;padding:12px;border-radius:var(--rs);border:1px solid var(--b);background:var(--s1);color:var(--t2);text-align:center;cursor:pointer;font-size:13px;font-weight:600}
 .vtbtn.active{background:linear-gradient(135deg,#b71c2c,#e83d8a);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(183,28,44,0.3)}
+.srchwrap{display:flex;gap:8px;align-items:stretch}
+.srchwrap .gi{flex:1}
+.srchbtn{flex-shrink:0;width:42px;border:none;border-radius:var(--rs);background:linear-gradient(135deg,#7c4dff,#b39dff);color:#fff;font-size:16px;cursor:pointer;box-shadow:0 4px 14px rgba(124,77,255,0.3)}
+.srchbtn:active{transform:scale(0.94)}
 </style>
 </head>
 <body>
@@ -241,7 +247,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
       <div id="ibc"></div>
       <div class="ptitle" id="dgreet">Good Morning 👋</div>
       <div class="psub" id="dname">Welcome</div>
-      <input class="gi" id="gsrchHome" placeholder="🔍 Search everything — name, phone, batch, expense..." oninput="globalSearch('gsrchHome','gsrchResultsHome')" style="margin-bottom:12px;">
+      <div class="srchwrap" style="margin-bottom:12px;">
+        <input class="gi" id="gsrchHome" placeholder="🔍 Search everything — name, phone, batch, expense..." oninput="globalSearch('gsrchHome','gsrchResultsHome')">
+        <button type="button" class="srchbtn" onclick="globalSearch('gsrchHome','gsrchResultsHome')">🔍</button>
+      </div>
       <div id="gsrchResultsHome"></div>
       <div class="sgrid">
         <div class="scard"><div class="sico">👥</div><div class="sval pk" id="sv1">0</div><div class="slbl">Total Visitors</div></div>
@@ -278,7 +287,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
     <div class="sec" id="sec-visitors">
       <div class="ptitle">Visitors</div>
       <div class="psub">Campus and virtual visit records</div>
-      <input class="gi" style="margin-bottom:12px;" placeholder="🔍 Search..." id="vsrch" oninput="renderV()">
+      <div class="srchwrap" style="margin-bottom:12px;">
+        <input class="gi" placeholder="🔍 Search..." id="vsrch" oninput="renderV()">
+        <button type="button" class="srchbtn" onclick="renderV()">🔍</button>
+      </div>
       <div class="stabs">
         <div class="stab active" onclick="setVF('',this)">All</div>
         <div class="stab" onclick="setVF('New',this)">New</div>
@@ -325,7 +337,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
         </div>
       </div>
       <div class="sh"><div class="sht">Recent Records</div></div>
-      <input class="gi" id="attsrch" placeholder="🔍 Search by batch, date or subject..." oninput="renderAttHist()" style="margin-bottom:10px;">
+      <div class="srchwrap" style="margin-bottom:10px;">
+        <input class="gi" id="attsrch" placeholder="🔍 Search by batch, date or subject..." oninput="renderAttHist()">
+        <button type="button" class="srchbtn" onclick="renderAttHist()">🔍</button>
+      </div>
       <div id="attHist"><div class="empty"><div class="emico">📋</div><div class="emtxt">No records yet</div></div></div>
     </div>
 
@@ -346,7 +361,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
         <div class="stab" onclick="setEF('Other',this)">📦 Other</div>
       </div>
       <button class="gbtn gbtn-or gbtn-full" onclick="openM('mae')" style="margin-bottom:14px;">➕ Add Expense</button>
-      <input class="gi" id="esrch" placeholder="🔍 Search by purpose, category, amount..." oninput="renderE()" style="margin-bottom:10px;">
+      <div class="srchwrap" style="margin-bottom:10px;">
+        <input class="gi" id="esrch" placeholder="🔍 Search by purpose, category, amount..." oninput="renderE()">
+        <button type="button" class="srchbtn" onclick="renderE()">🔍</button>
+      </div>
       <div id="elist"><div class="empty"><div class="emico">🧾</div><div class="emtxt">No expenses yet</div></div></div>
     </div>
 
@@ -372,7 +390,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
           <button class="gbtn gbtn-tl gbtn-sm" onclick="syncGoogleContacts()">🔄 Sync Google Contacts</button>
           <button class="gbtn gbtn-gl gbtn-sm" onclick="openM('mladd')">➕ Add Lead</button>
         </div>
-        <input class="gi" id="ldsrch" placeholder="🔍 Search by name or number..." oninput="renderLeads()" style="margin-bottom:10px;">
+        <div class="srchwrap" style="margin-bottom:10px;">
+          <input class="gi" id="ldsrch" placeholder="🔍 Search by name or number..." oninput="renderLeads()">
+          <button type="button" class="srchbtn" onclick="renderLeads()">🔍</button>
+        </div>
         <div class="stabs" id="ldFilterTabs">
           <div class="stab active" onclick="setLdF('',this)">All</div>
           <div class="stab" onclick="setLdF('New',this)">New</div>
@@ -400,7 +421,9 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 
       <!-- SEND LOG SUBTAB -->
       <div id="ld-log" style="display:none;">
-        <div class="fld"><label>Filter by Contact (name/number)</label><input class="gi" id="ldLogSrch" oninput="renderSendLog()" placeholder="Type to filter..."></div>
+        <div class="fld"><label>Filter by Contact (name/number)</label>
+          <div class="srchwrap"><input class="gi" id="ldLogSrch" oninput="renderSendLog()" placeholder="Type to filter..."><button type="button" class="srchbtn" onclick="renderSendLog()">🔍</button></div>
+        </div>
         <div id="ldLogSummary" class="gc" style="display:none;"></div>
         <div id="ldloglist"></div>
       </div>
@@ -412,8 +435,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
       <div class="psub">Export and share reports individually</div>
       <div class="stabs">
         <div class="stab active" onclick="rpTab('v',this)">👥 Visitors</div>
-        <div class="stab" onclick="rpTab('e',this)">💰 Expenses</div>
+        <div class="stab" onclick="rpTab('l',this)">🎯 Leads</div>
         <div class="stab" onclick="rpTab('a',this)">📋 Attendance</div>
+        <div class="stab" onclick="rpTab('e',this)">💰 Expenses</div>
+        <div class="stab" onclick="rpTab('f',this)">✨ Final Report</div>
       </div>
       <div id="rpc"><div class="loading"><span class="spin"></span>Generating...</div></div>
     </div>
@@ -543,7 +568,10 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
       </div>
       <div class="gc">
         <div style="font-size:13px;font-weight:700;margin-bottom:12px;">🌐 Global Search</div>
-        <input class="gi" id="gsrch" placeholder="🔍 Search across Visitors, Leads, Expenses, Attendance..." oninput="globalSearch('gsrch','gsrchResults')">
+        <div class="srchwrap">
+          <input class="gi" id="gsrch" placeholder="🔍 Search across Visitors, Leads, Expenses, Attendance..." oninput="globalSearch('gsrch','gsrchResults')">
+          <button type="button" class="srchbtn" onclick="globalSearch('gsrch','gsrchResults')">🔍</button>
+        </div>
         <div id="gsrchResults"></div>
       </div>
       <div class="gc">
@@ -595,6 +623,13 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
   <div class="frow">
     <div class="fld"><label>Name *</label><input class="gi" id="vn" placeholder="Full name"></div>
     <div class="fld"><label>Type</label><select class="gs" id="vvt"><option>Student</option><option>Parent</option><option>Consultant</option><option>Agent</option><option>Both</option></select></div>
+  </div>
+  <div class="fld"><label>📷 Take Picture (auto-added to report)</label>
+    <div class="upa" style="padding:9px;text-align:left;display:flex;align-items:center;gap:8px;" onclick="document.getElementById('vPhotoInput').click()">
+      <input type="file" id="vPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleVisitorPhoto(event)">
+      <img id="vPhotoPreview" style="width:34px;height:34px;border-radius:8px;object-fit:cover;display:none;" alt="preview">
+      <span id="vPhotoTxt" style="font-size:12px;color:var(--t3);">Tap to capture a photo</span>
+    </div>
   </div>
   <div class="frow">
     <div class="fld"><label>Contact</label><input class="gi" id="vph" type="tel" placeholder="+91 XXXXX"></div>
@@ -692,6 +727,12 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
       <input type="checkbox" class="chi" id="dc6" value="Photos"><label class="chl" for="dc6">Photos</label>
       <input type="checkbox" class="chi" id="dc7" value="Aadhar"><label class="chl" for="dc7">Aadhar</label>
     </div>
+    <div class="upa" style="margin-top:10px;" onclick="document.getElementById('vDocsInput').click()">
+      <input type="file" id="vDocsInput" accept="image/*" multiple style="display:none" onchange="handleVisitorDocs(event)">
+      <div style="font-size:22px;">📎</div>
+      <div style="font-size:11px;color:var(--t3);" id="vDocsTxt">Tap to upload document photos (marksheet, ID, etc.)</div>
+    </div>
+    <div id="vDocsPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
   </div>
   <div class="fld"><label>Major Queries</label><textarea class="gta" id="vmq" placeholder="Fee, hostel, bond, recognition..."></textarea></div>
   <div class="frow">
@@ -947,6 +988,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 <div class="mov" id="mreport"><div class="modal">
   <div class="mhandle"></div>
   <div class="mtitle" id="reportTitle">📊 Report <button class="cbtn" onclick="closeM('mreport')">✕</button></div>
+  <div id="reportPhotoWrap" style="text-align:center;margin-bottom:10px;display:none;"><img id="reportPhoto" style="width:88px;height:88px;border-radius:16px;object-fit:cover;border:2px solid var(--b2);box-shadow:0 4px 16px rgba(120,105,180,0.15);"></div>
   <div style="font-size:11px;color:var(--t3);margin-bottom:10px;" id="reportTargetLbl">—</div>
   <div class="brow" style="margin-bottom:4px;">
     <button class="gbtn gbtn-bl gbtn-sm" onclick="aiPolishReport()">✨ AI Professional Rewrite</button>
