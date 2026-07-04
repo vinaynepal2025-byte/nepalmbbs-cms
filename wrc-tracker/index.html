@@ -12,46 +12,57 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>WRC Nepal Staff Tracker</title>
 <style>
-:root{--bg:#f3f0fb;--s1:rgba(255,255,255,0.55);--s2:rgba(255,255,255,0.8);--b:rgba(120,105,180,0.16);--b2:rgba(120,105,180,0.32);--tx:#241f3d;--t2:rgba(36,31,61,0.68);--t3:rgba(36,31,61,0.46);--pk:#ff5fa2;--or:#ff8a4c;--yl:#e8a916;--tl:#06b389;--bl:#2f95e0;--pu:#8467f0;--rd:#e94f4f;--wred:#b71c2c;--r:20px;--rs:14px;--rx:10px}
+:root{--bg:#f3f0fb;--s1:rgba(255,255,255,0.50);--s2:rgba(255,255,255,0.70);--b:rgba(120,105,180,0.14);--b2:rgba(120,105,180,0.30);--gedge:rgba(255,255,255,0.9);--gshade:rgba(90,75,140,0.10);--tx:#241f3d;--t2:rgba(36,31,61,0.68);--t3:rgba(36,31,61,0.46);--pk:#ff5fa2;--or:#ff8a4c;--yl:#e8a916;--tl:#06b389;--bl:#2f95e0;--pu:#8467f0;--rd:#e94f4f;--wred:#b71c2c;--r:22px;--rs:16px;--rx:10px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:
-  radial-gradient(circle at 15% 8%,rgba(255,143,197,0.35),transparent 42%),
-  radial-gradient(circle at 85% 0%,rgba(139,111,255,0.28),transparent 46%),
-  radial-gradient(circle at 30% 100%,rgba(6,214,160,0.22),transparent 50%),
-  radial-gradient(circle at 90% 70%,rgba(79,195,247,0.22),transparent 45%),
-  var(--bg);color:var(--tx);font-size:14px}
+  radial-gradient(circle at 15% 8%,rgba(255,143,197,0.16),transparent 42%),
+  radial-gradient(circle at 85% 0%,rgba(139,111,255,0.20),transparent 46%),
+  radial-gradient(circle at 30% 100%,rgba(6,214,160,0.10),transparent 50%),
+  radial-gradient(circle at 90% 70%,rgba(79,195,247,0.14),transparent 45%),
+  linear-gradient(160deg,#eef0fd 0%,#f3eefc 55%,#f6eefb 100%);color:var(--tx);font-size:14px}
 .orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:fl 9s ease-in-out infinite;opacity:0.7}
-.o1{width:500px;height:500px;background:radial-gradient(circle,rgba(255,110,180,0.45),transparent);top:-150px;left:-150px}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);animation:fl 9s ease-in-out infinite;opacity:0.38}
+.o1{width:500px;height:500px;background:radial-gradient(circle,rgba(255,110,180,0.4),transparent);top:-150px;left:-150px}
 .o2{width:400px;height:400px;background:radial-gradient(circle,rgba(139,108,245,0.4),transparent);top:35%;right:-100px;animation-delay:3s}
 .o3{width:350px;height:350px;background:radial-gradient(circle,rgba(79,195,247,0.4),transparent);bottom:-80px;left:25%;animation-delay:6s}
 @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-35px)}}
 .app{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column}
-.hdr{padding:12px 16px 10px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.55);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--b);flex-shrink:0;box-shadow:0 1px 20px rgba(120,105,180,0.06)}
+.hdr{padding:14px 18px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.55);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:none;border-radius:0 0 26px 26px;flex-shrink:0;box-shadow:0 8px 28px rgba(120,105,180,0.12),inset 0 1px 0 rgba(255,255,255,0.9)}
+.hbtn{width:34px;height:34px;border-radius:50%;background:var(--s2);border:1px solid rgba(255,255,255,0.7);backdrop-filter:blur(10px) saturate(180%);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.8)}
+.uav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pu),var(--pk));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:2px solid rgba(255,255,255,0.75);box-shadow:0 4px 14px rgba(132,103,240,0.35)}
 .hlogo{display:flex;align-items:center;gap:10px}
 .hicon{width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,0.9);background:#fff;box-shadow:0 2px 10px rgba(120,105,180,0.15)}
 .hicon img{width:100%;height:100%;object-fit:cover}
 .htxt{font-size:15px;font-weight:700}
 .hsub{font-size:10px;color:var(--t3)}
 .hbtns{display:flex;gap:8px;align-items:center}
-.hbtn{width:34px;height:34px;border-radius:50%;background:var(--s1);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
-.uav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pu),var(--pk));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--b2)}
-.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 78px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 96px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .content::-webkit-scrollbar{display:none}
-.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,0.7);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-around;padding:8px 0 max(10px,env(safe-area-inset-bottom));z-index:100;overflow-x:auto;box-shadow:0 -1px 20px rgba(120,105,180,0.06)}
-.nbtn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;cursor:pointer;border-radius:14px;transition:all 0.2s;min-width:46px;position:relative;flex-shrink:0}
-.ni{font-size:20px;transition:transform 0.2s}
-.nl{font-size:8px;color:var(--t3);font-weight:500}
-.nbtn.active .ni{transform:scale(1.18)}
-.nbtn.active .nl{color:var(--pu)}
-.nbtn.active{background:rgba(132,103,240,0.14)}
+.bnav{position:absolute;bottom:14px;left:14px;right:14px;background:rgba(255,255,255,0.62);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,0.8);border-radius:999px;display:flex;align-items:center;justify-content:space-around;padding:8px 6px max(8px,env(safe-area-inset-bottom));z-index:100;overflow-x:auto;box-shadow:0 10px 34px rgba(90,75,160,0.18),inset 0 1px 0 rgba(255,255,255,0.9)}
+.bnav::-webkit-scrollbar{display:none}
+.nbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;cursor:pointer;border-radius:999px;transition:all 0.2s;min-width:44px;position:relative;flex-shrink:0}
+.ni{font-size:19px;transition:transform 0.2s}
+.nl{font-size:8px;color:var(--t3);font-weight:600}
+.nbtn.active .ni{transform:scale(1.1)}
+.nbtn.active .nl{color:#fff}
+.nbtn.active{background:linear-gradient(135deg,var(--pu),var(--pk));box-shadow:0 6px 18px rgba(132,103,240,0.45)}
 .nbadge{position:absolute;top:0;right:2px;background:var(--pk);color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:8px;display:none}
 .sec{display:none}.sec.active{display:block}
-.gc{background:var(--s1);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--b);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:0 4px 24px rgba(120,105,180,0.08),inset 0 1px 0 rgba(255,255,255,0.6)}
+.gc{background:var(--s1);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--b);border-top-color:var(--gedge);border-left-color:var(--gedge);border-radius:var(--r);padding:16px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 4px 28px rgba(120,105,180,0.10),inset 0 1px 0 var(--gedge),inset 0 -1px 0 var(--gshade)}
 .ptitle{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:3px}
+.crumb{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--pu);font-weight:700;cursor:pointer;margin-bottom:10px;padding:5px 12px 5px 8px;background:var(--s1);border-radius:20px;border:1px solid var(--b)}
+.navgrid{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.navtile{display:flex;align-items:center;gap:14px;padding:16px;background:var(--s1);border:1px solid var(--b);border-top-color:var(--gedge);border-left-color:var(--gedge);border-radius:var(--rs);cursor:pointer;backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);box-shadow:0 2px 14px rgba(120,105,180,0.08),inset 0 1px 0 var(--gedge);transition:transform 0.15s}
+.navtile:active{transform:scale(0.98)}
+.navtile-ico{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:linear-gradient(135deg,rgba(179,157,255,0.28),rgba(255,110,180,0.22))}
+.navtile-body{flex:1;min-width:0}
+.navtile-title{font-size:14px;font-weight:700}
+.navtile-desc{font-size:11px;color:var(--t3);margin-top:2px}
+.navtile-chev{font-size:20px;color:var(--t3);flex-shrink:0}
 .psub{font-size:12px;color:var(--t3);margin-bottom:14px}
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.scard{background:var(--s1);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--b);border-radius:var(--rs);padding:14px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(120,105,180,0.07),inset 0 1px 0 rgba(255,255,255,0.6)}
+.scard{background:var(--s1);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--b);border-top-color:var(--gedge);border-left-color:var(--gedge);border-radius:var(--rs);padding:14px;position:relative;overflow:hidden;box-shadow:0 4px 22px rgba(120,105,180,0.09),inset 0 1px 0 var(--gedge),inset 0 -1px 0 var(--gshade)}
 .sico{font-size:22px;margin-bottom:6px}
 .sval{font-size:26px;font-weight:800;line-height:1}
 .slbl{font-size:11px;color:var(--t3);margin-top:3px;font-weight:500}
@@ -64,7 +75,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 .gbtn-pu{background:linear-gradient(135deg,#7c4dff,#b39dff);box-shadow:0 4px 20px rgba(124,77,255,0.4)}
 .gbtn-bl{background:linear-gradient(135deg,#0288d1,#4fc3f7)}
 .gbtn-rd{background:linear-gradient(135deg,#8e1722,#b71c2c);box-shadow:0 4px 20px rgba(183,28,44,0.4)}
-.gbtn-gl{background:var(--s2);border:1px solid var(--b2);color:var(--tx);backdrop-filter:blur(10px);box-shadow:none}
+.gbtn-gl{background:var(--s2);border:1px solid var(--b2);color:var(--tx);backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%);box-shadow:inset 0 1px 0 var(--gedge)}
 .gbtn-sm{padding:8px 16px;font-size:12px}
 .gbtn-full{width:100%}
 .brow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
@@ -88,7 +99,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 .bdg-pu{background:rgba(179,157,255,0.18);color:var(--pu);border:1px solid rgba(179,157,255,0.28)}
 .bdg-rd{background:rgba(255,107,107,0.18);color:var(--rd);border:1px solid rgba(255,107,107,0.28)}
 .bdg-yl{background:rgba(255,209,102,0.18);color:var(--yl);border:1px solid rgba(255,209,102,0.28)}
-.li{background:var(--s1);border:1px solid var(--b);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(120,105,180,0.06)}
+.li{background:var(--s1);border:1px solid var(--b);border-top-color:var(--gedge);border-left-color:var(--gedge);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);box-shadow:0 2px 14px rgba(120,105,180,0.08),inset 0 1px 0 var(--gedge)}
 .liav{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
 .libody{flex:1;min-width:0}
 .liname{font-size:14px;font-weight:600}
@@ -98,13 +109,13 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 .lidate{font-size:10px;color:var(--t3);margin-bottom:4px}
 .stabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none}
 .stabs::-webkit-scrollbar{display:none}
-.stab{padding:7px 15px;border-radius:20px;white-space:nowrap;background:var(--s1);border:1px solid var(--b);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;flex-shrink:0}
+.stab{padding:7px 15px;border-radius:20px;white-space:nowrap;background:var(--s1);border:1px solid var(--b);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;flex-shrink:0;backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%)}
 .stab.active{background:linear-gradient(135deg,#b71c2c,#e83d8a);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(183,28,44,0.3)}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(255,255,255,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--b2);border-radius:50px;padding:10px 22px;font-size:13px;font-weight:600;color:var(--tx);z-index:9999;opacity:0;transition:all 0.3s;white-space:nowrap;pointer-events:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 30px rgba(120,105,180,0.18)}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(255,255,255,0.7);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,0.85);border-radius:50px;padding:10px 22px;font-size:13px;font-weight:600;color:var(--tx);z-index:9999;opacity:0;transition:all 0.3s;white-space:nowrap;pointer-events:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 34px rgba(120,105,180,0.22),inset 0 1px 0 rgba(255,255,255,0.85)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.mov{position:fixed;inset:0;background:rgba(60,50,90,0.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.mov{position:fixed;inset:0;background:rgba(60,50,90,0.28);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);z-index:500;display:none;align-items:flex-end;justify-content:center}
 .mov.open{display:flex}
-.modal{background:rgba(255,255,255,0.88);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.9);border-top:1px solid rgba(255,255,255,0.9);border-radius:24px 24px 0 0;padding:20px 16px max(32px,env(safe-area-inset-bottom));width:100%;max-height:93vh;overflow-y:auto;scrollbar-width:none;box-shadow:0 -8px 40px rgba(120,105,180,0.18)}
+.modal{background:rgba(255,255,255,0.62);backdrop-filter:blur(36px) saturate(190%);-webkit-backdrop-filter:blur(36px) saturate(190%);border:1px solid rgba(255,255,255,0.9);border-top:1px solid rgba(255,255,255,0.95);border-radius:24px 24px 0 0;padding:20px 16px max(32px,env(safe-area-inset-bottom));width:100%;max-height:93vh;overflow-y:auto;scrollbar-width:none;box-shadow:0 -8px 44px rgba(120,105,180,0.22),inset 0 1px 0 rgba(255,255,255,0.9);position:relative}
 .modal::-webkit-scrollbar{display:none}
 .mhandle{width:40px;height:4px;border-radius:2px;background:var(--b2);margin:0 auto 16px}
 .mtitle{font-size:17px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
@@ -283,8 +294,101 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
       <div id="dfu"><div class="empty"><div class="emico">✅</div><div class="emtxt">No pending follow-ups</div></div></div>
     </div>
 
+    <!-- HUB: ADMISSIONS -->
+    <div class="sec" id="sec-hub-admissions">
+      <div class="ptitle">Admissions</div>
+      <div class="psub">Visitor tracking &amp; lead pipeline</div>
+      <div class="navgrid">
+        <div class="navtile" onclick="showSec('visitors',null,'hub-admissions')">
+          <div class="navtile-ico">👥</div>
+          <div class="navtile-body"><div class="navtile-title">Visitors</div><div class="navtile-desc">Campus &amp; virtual visit records, follow-ups</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('leads',null,'hub-admissions')">
+          <div class="navtile-ico">🎯</div>
+          <div class="navtile-body"><div class="navtile-title">Leads</div><div class="navtile-desc">Contacts, cold-calling &amp; conversion tracking</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUB: ACADEMICS -->
+    <div class="sec" id="sec-hub-academics">
+      <div class="ptitle">Academics</div>
+      <div class="psub">Attendance, library &amp; academic documents</div>
+      <div class="navgrid">
+        <div class="navtile" onclick="showSec('attendance',null,'hub-academics')">
+          <div class="navtile-ico">📋</div>
+          <div class="navtile-body"><div class="navtile-title">Attendance</div><div class="navtile-desc">Batch-wise student attendance</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('library',null,'hub-academics')">
+          <div class="navtile-ico">📚</div>
+          <div class="navtile-body"><div class="navtile-title">Library</div><div class="navtile-desc">Student in/out log</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('documents',null,'hub-academics')">
+          <div class="navtile-ico">📄</div>
+          <div class="navtile-body"><div class="navtile-title">Documents</div><div class="navtile-desc">Marksheets &amp; commitment letters</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUB: FINANCE -->
+    <div class="sec" id="sec-hub-finance">
+      <div class="ptitle">Finance</div>
+      <div class="psub">Student fees &amp; operational expenses</div>
+      <div class="navgrid">
+        <div class="navtile" onclick="showSec('fees',null,'hub-finance')">
+          <div class="navtile-ico">💰</div>
+          <div class="navtile-body"><div class="navtile-title">Student Fees</div><div class="navtile-desc">Payments, dues, reminders &amp; receipts</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('expenses',null,'hub-finance')">
+          <div class="navtile-ico">🧾</div>
+          <div class="navtile-body"><div class="navtile-title">Expenses</div><div class="navtile-desc">Travel, food, hotel &amp; media costs</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HUB: MORE -->
+    <div class="sec" id="sec-hub-more">
+      <div class="ptitle">More</div>
+      <div class="psub">Hostel, student care, reports &amp; notices</div>
+      <div class="navgrid">
+        <div class="navtile" onclick="showSec('hostel',null,'hub-more')">
+          <div class="navtile-ico">🛏️</div>
+          <div class="navtile-body"><div class="navtile-title">Hostel</div><div class="navtile-desc">Rooms, issues, mess &amp; leave passes</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('care',null,'hub-more')">
+          <div class="navtile-ico">⚖️</div>
+          <div class="navtile-body"><div class="navtile-title">Student Care</div><div class="navtile-desc">Disputes, complaints &amp; mentor logs</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('reports',null,'hub-more')">
+          <div class="navtile-ico">📊</div>
+          <div class="navtile-body"><div class="navtile-title">Reports</div><div class="navtile-desc">Per-section &amp; final combined reports</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('notices',null,'hub-more')">
+          <div class="navtile-ico">🔔</div>
+          <div class="navtile-body"><div class="navtile-title">Notices</div><div class="navtile-desc">Announcements &amp; circulars</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="showSec('marketing',null,'hub-more')">
+          <div class="navtile-ico">📢</div>
+          <div class="navtile-body"><div class="navtile-title">Marketing</div><div class="navtile-desc">Social links, cold-calling &amp; results upload</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+      </div>
+    </div>
+
     <!-- VISITORS -->
     <div class="sec" id="sec-visitors">
+      <div class="crumb" onclick="showSec('hub-admissions')">‹ Admissions</div>
       <div class="ptitle">Visitors</div>
       <div class="psub">Campus and virtual visit records</div>
       <div class="srchwrap" style="margin-bottom:12px;">
@@ -305,6 +409,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 
     <!-- ATTENDANCE -->
     <div class="sec" id="sec-attendance">
+      <div class="crumb" onclick="showSec('hub-academics')">‹ Academics</div>
       <div class="ptitle">Attendance</div>
       <div class="psub">Student batch attendance</div>
       <div class="gc">
@@ -326,7 +431,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
       <div class="gc" id="attc" style="display:none;">
         <div style="overflow-x:auto;">
           <table class="atbl">
-            <thead><tr><th>#</th><th>Name</th><th>P/A</th><th>Reason</th></tr></thead>
+            <thead><tr><th>#</th><th>Name</th><th>P/A</th><th>Reason</th><th>Application</th></tr></thead>
             <tbody id="atbody"></tbody>
           </table>
         </div>
@@ -344,8 +449,356 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
       <div id="attHist"><div class="empty"><div class="emico">📋</div><div class="emtxt">No records yet</div></div></div>
     </div>
 
+    <!-- LIBRARY -->
+    <div class="sec" id="sec-library">
+      <div class="crumb" onclick="showSec('hub-academics')">‹ Academics</div>
+      <div class="ptitle">Library</div>
+      <div class="psub">Student in/out log — supports multiple visits per day</div>
+      <div class="gc">
+        <div class="frow">
+          <div class="fld ffull"><label>Student Name</label><input class="gi" id="libName" placeholder="Type student name" list="libNameList"></div>
+        </div>
+        <datalist id="libNameList"></datalist>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="checkInLibrary()">✅ Check In</button>
+      </div>
+      <div class="sh"><div class="sht">Today's Log</div></div>
+      <div class="srchwrap" style="margin-bottom:10px;">
+        <input class="gi" id="libsrch" placeholder="🔍 Search by name or date..." oninput="renderLibraryList()">
+        <button type="button" class="srchbtn" onclick="renderLibraryList()">🔍</button>
+      </div>
+      <div id="libList"><div class="empty"><div class="emico">📚</div><div class="emtxt">No entries yet</div></div></div>
+    </div>
+
+    <!-- DOCUMENTS (Marksheet + Commitment Letter) -->
+    <div class="sec" id="sec-documents">
+      <div class="crumb" onclick="showSec('hub-academics')">‹ Academics</div>
+      <div class="ptitle">Documents</div>
+      <div class="psub">Generate marksheets &amp; commitment letters for any student</div>
+      <div class="gc">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Student Details</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="docStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="frow">
+          <div class="fld"><label>College / Course</label><input class="gi" id="docCollege" placeholder="e.g. Chitwan Medical College" list="brandCollegeList"></div>
+          <div class="fld"><label>Phone (optional)</label><input class="gi" type="tel" id="docPhone" placeholder="+91 XXXXX"></div>
+        </div>
+        <div class="fld"><label>Email (optional)</label><input class="gi" type="email" id="docEmail" placeholder="email@..."></div>
+      </div>
+      <div class="navgrid">
+        <div class="navtile" onclick="openMarksheet()">
+          <div class="navtile-ico">🎓</div>
+          <div class="navtile-body"><div class="navtile-title">Generate Marksheet</div><div class="navtile-desc">Subject-wise marks with college letterhead</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+        <div class="navtile" onclick="openCommitmentLetter()">
+          <div class="navtile-ico">📜</div>
+          <div class="navtile-body"><div class="navtile-title">Generate Commitment Letter</div><div class="navtile-desc">Seat booking confirmation with deposit/balance</div></div>
+          <div class="navtile-chev">›</div>
+        </div>
+      </div>
+      <datalist id="brandCollegeList"></datalist>
+    </div>
+
+    <!-- STUDENT FEES -->
+    <div class="sec" id="sec-fees">
+      <div class="crumb" onclick="showSec('hub-finance')">‹ Finance</div>
+      <div class="ptitle">Student Fees</div>
+      <div class="psub">Fee tracking — received, pending, due dates &amp; reminders</div>
+      <div class="sgrid">
+        <div class="scard"><div class="sico">💰</div><div class="sval tl" id="fsCollected">₹0</div><div class="slbl">Total Collected</div></div>
+        <div class="scard"><div class="sico">⏳</div><div class="sval or" id="fsPending">₹0</div><div class="slbl">Total Pending</div></div>
+      </div>
+      <div class="gc">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ New Fee Record</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="feStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="frow">
+          <div class="fld"><label>Phone (for reminders)</label><input class="gi" type="tel" id="fePhone" placeholder="+91 XXXXX"></div>
+          <div class="fld"><label>Email (for reminders)</label><input class="gi" type="email" id="feEmail" placeholder="email@..."></div>
+        </div>
+        <div class="frow">
+          <div class="fld"><label>Course / College</label><input class="gi" id="feCourse" placeholder="e.g. MBBS 2026"></div>
+          <div class="fld"><label>Total Fee</label><input class="gi" type="number" id="feTotal" placeholder="0.00"></div>
+        </div>
+        <div class="frow">
+          <div class="fld"><label>Currency</label>
+            <select class="gs" id="feCur"><option value="INR">₹ INR</option><option value="NPR">रू NPR</option></select>
+          </div>
+          <div class="fld"><label>Next Due Date</label><input class="gi" type="date" id="feDue"></div>
+        </div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="createFeeRecord()">💾 Create Fee Record</button>
+      </div>
+      <div class="sh"><div class="sht">All Students</div></div>
+      <div class="srchwrap" style="margin-bottom:10px;">
+        <input class="gi" id="fesrch" placeholder="🔍 Search by student name..." oninput="renderFeesList()">
+        <button type="button" class="srchbtn" onclick="renderFeesList()">🔍</button>
+      </div>
+      <div id="feesList"><div class="empty"><div class="emico">💰</div><div class="emtxt">No fee records yet</div></div></div>
+    </div>
+
+    <!-- ADD PAYMENT MODAL -->
+    <div class="mov" id="mfeepay"><div class="modal">
+      <div class="mhandle"></div>
+      <div class="mtitle">➕ Add Payment <button class="cbtn" onclick="closeM('mfeepay')">✕</button></div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px;" id="feePayTargetLbl">For: —</div>
+      <div class="frow">
+        <div class="fld"><label>Amount</label><input class="gi" type="number" id="feePayAmt" placeholder="0.00"></div>
+        <div class="fld"><label>Date</label><input class="gi" type="date" id="feePayDate"></div>
+      </div>
+      <div class="fld"><label>Mode</label>
+        <div class="chips">
+          <input type="radio" class="chi" name="feepm" id="fpm1" value="Cash" checked><label class="chl" for="fpm1">💵 Cash</label>
+          <input type="radio" class="chi" name="feepm" id="fpm2" value="UPI"><label class="chl" for="fpm2">📲 UPI</label>
+          <input type="radio" class="chi" name="feepm" id="fpm3" value="Bank Transfer"><label class="chl" for="fpm3">🏦 Bank</label>
+          <input type="radio" class="chi" name="feepm" id="fpm4" value="Card"><label class="chl" for="fpm4">💳 Card</label>
+        </div>
+      </div>
+      <button class="gbtn gbtn-pu gbtn-full" onclick="saveFeePayment()">💾 Save Payment &amp; Generate Receipt</button>
+    </div></div>
+
+    <!-- RECEIPT VIEWER -->
+    <div class="mov" id="mreceipt"><div class="modal">
+      <div class="mhandle"></div>
+      <div class="mtitle">🧾 Receipt <button class="cbtn" onclick="closeM('mreceipt')">✕</button></div>
+      <div id="receiptPrintArea" style="background:#fff;color:#1a1a2e;padding:20px;border-radius:12px;font-family:Georgia,serif;"></div>
+      <div class="brow">
+        <button class="gbtn gbtn-tl gbtn-sm" onclick="copyReceiptText()">📋 Copy</button>
+        <button class="gbtn gbtn-pu gbtn-sm" onclick="printReceipt()">🖨️ Print / Save PDF</button>
+        <button class="gbtn gbtn-gl gbtn-sm" onclick="sendReceiptWA()">💬 WhatsApp</button>
+        <button class="gbtn gbtn-or gbtn-sm" onclick="sendReceiptEmail()">✉️ Email</button>
+      </div>
+    </div></div>
+
+    <!-- MARKSHEET GENERATOR -->
+    <div class="mov" id="mmarksheet"><div class="modal">
+      <div class="mhandle"></div>
+      <div class="mtitle">🎓 Generate Marksheet <button class="cbtn" onclick="closeM('mmarksheet')">✕</button></div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px;" id="marksheetTargetLbl">For: —</div>
+      <div id="marksheetRows"></div>
+      <button class="gbtn gbtn-gl gbtn-sm" onclick="addMarksheetRow()" style="margin-bottom:12px;">➕ Add Subject</button>
+      <button class="gbtn gbtn-pu gbtn-full" onclick="generateMarksheet()">✨ Generate</button>
+      <div id="marksheetPreviewWrap" style="display:none;margin-top:14px;">
+        <div id="marksheetPrintArea" style="background:#fff;color:#1a1a2e;padding:20px;border-radius:12px;font-family:Georgia,serif;"></div>
+        <div class="brow">
+          <button class="gbtn gbtn-tl gbtn-sm" onclick="copyDocText('marksheetPrintArea')">📋 Copy</button>
+          <button class="gbtn gbtn-pu gbtn-sm" onclick="printDoc('marksheetPrintArea')">🖨️ Print / Save PDF</button>
+          <button class="gbtn gbtn-gl gbtn-sm" onclick="shareDocWA('marksheetPrintArea')">💬 WhatsApp</button>
+          <button class="gbtn gbtn-or gbtn-sm" onclick="shareDocEmail('marksheetPrintArea','Marksheet')">✉️ Email</button>
+        </div>
+      </div>
+    </div></div>
+
+    <!-- COMMITMENT LETTER GENERATOR -->
+    <div class="mov" id="mcommit"><div class="modal">
+      <div class="mhandle"></div>
+      <div class="mtitle">📜 Commitment Letter <button class="cbtn" onclick="closeM('mcommit')">✕</button></div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px;" id="commitTargetLbl">For: —</div>
+      <div class="frow">
+        <div class="fld"><label>Course</label><input class="gi" id="commitCourse" placeholder="e.g. MBBS 2026"></div>
+        <div class="fld"><label>Seat Booking Date</label><input class="gi" type="date" id="commitDate"></div>
+      </div>
+      <div class="frow">
+        <div class="fld"><label>Amount Deposited</label><input class="gi" type="number" id="commitDeposit" placeholder="0.00"></div>
+        <div class="fld"><label>Total Course Fee</label><input class="gi" type="number" id="commitTotal" placeholder="0.00"></div>
+      </div>
+      <button class="gbtn gbtn-pu gbtn-full" onclick="generateCommitmentLetter()">✨ Generate</button>
+      <div id="commitPreviewWrap" style="display:none;margin-top:14px;">
+        <div id="commitPrintArea" style="background:#fff;color:#1a1a2e;padding:20px;border-radius:12px;font-family:Georgia,serif;"></div>
+        <div class="brow">
+          <button class="gbtn gbtn-tl gbtn-sm" onclick="copyDocText('commitPrintArea')">📋 Copy</button>
+          <button class="gbtn gbtn-pu gbtn-sm" onclick="printDoc('commitPrintArea')">🖨️ Print / Save PDF</button>
+          <button class="gbtn gbtn-gl gbtn-sm" onclick="shareDocWA('commitPrintArea')">💬 WhatsApp</button>
+          <button class="gbtn gbtn-or gbtn-sm" onclick="shareDocEmail('commitPrintArea','Commitment Letter')">✉️ Email</button>
+        </div>
+      </div>
+    </div></div>
+
+    <!-- HOSTEL MANAGEMENT -->
+    <div class="sec" id="sec-hostel">
+      <div class="crumb" onclick="showSec('hub-more')">‹ More</div>
+      <div class="ptitle">Hostel</div>
+      <div class="psub">Rooms, issues, mess &amp; leave records</div>
+      <div class="stabs" id="hostelTabs">
+        <div class="stab active" onclick="setHostelTab('rooms',this)">🛏️ Rooms</div>
+        <div class="stab" onclick="setHostelTab('issues',this)">🛠️ Issues</div>
+        <div class="stab" onclick="setHostelTab('mess',this)">🍽️ Mess</div>
+        <div class="stab" onclick="setHostelTab('leave',this)">🚪 Leave/Pass</div>
+      </div>
+
+      <div class="gc" id="hostelFormRooms">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🛏️ Assign Room</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="roomStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="frow">
+          <div class="fld"><label>Block</label>
+            <select class="gs" id="roomBlock"><option value="Boys">Boys (B)</option><option value="Girls">Girls (G)</option></select>
+          </div>
+          <div class="fld"><label>Floor No</label><input class="gi" id="roomFloor" placeholder="e.g. 2nd Floor"></div>
+        </div>
+        <div class="fld"><label>Room No</label><input class="gi" id="roomNo" placeholder="e.g. 204"></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveHostelEntry()">💾 Assign Room</button>
+      </div>
+
+      <div class="gc" id="hostelFormIssues" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🛠️ Report Room Issue</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="issStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="fld"><label>Room No</label><input class="gi" id="issRoom" placeholder="e.g. 204"></div>
+        <div class="fld"><label>Issue Details</label><textarea class="gta" id="issNote" placeholder="Describe the issue..."></textarea></div>
+        <div class="fld"><label>Attach Photo / Video / Voice Note (optional)</label>
+          <input type="file" id="issFile" accept="image/*,video/*,audio/*" style="display:none" onchange="handleHostelFile(event)">
+          <button type="button" class="gbtn gbtn-gl gbtn-sm" onclick="document.getElementById('issFile').click()">📎 Attach File</button>
+          <span id="issFileTxt" style="font-size:11px;color:var(--t3);margin-left:8px;">No file attached</span>
+        </div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveHostelEntry()">💾 Log Issue</button>
+      </div>
+
+      <div class="gc" id="hostelFormMess" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🍽️ Report Mess Issue</div>
+        <div class="fld"><label>Student Name (optional)</label><input class="gi" id="messStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="fld"><label>Issue Details</label><textarea class="gta" id="messNote" placeholder="Food quality, hygiene, timing..."></textarea></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveHostelEntry()">💾 Log Mess Issue</button>
+      </div>
+
+      <div class="gc" id="hostelFormLeave" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🚪 New Leave / Pass</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="leaveStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="fld"><label>Pass Type</label>
+          <div class="chips">
+            <input type="radio" class="chi" name="passtype" id="pt1" value="Day Pass" checked><label class="chl" for="pt1">☀️ Day Pass</label>
+            <input type="radio" class="chi" name="passtype" id="pt2" value="Night Pass"><label class="chl" for="pt2">🌙 Night Pass</label>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fld"><label>Out Date/Time</label><input class="gi" type="datetime-local" id="leaveOutDT"></div>
+          <div class="fld"><label>Return Date/Time</label><input class="gi" type="datetime-local" id="leaveInDT"></div>
+        </div>
+        <div class="fld"><label>Reason (optional)</label><input class="gi" id="leaveReason" placeholder="Reason for leave"></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveHostelEntry()">💾 Save Pass</button>
+      </div>
+
+      <div class="sh"><div class="sht" id="hostelListTitle">Room Assignments</div></div>
+      <div class="srchwrap" style="margin-bottom:10px;">
+        <input class="gi" id="hostelsrch" placeholder="🔍 Search by student or room..." oninput="renderHostelList()">
+        <button type="button" class="srchbtn" onclick="renderHostelList()">🔍</button>
+      </div>
+      <div id="hostelList"><div class="empty"><div class="emico">🛏️</div><div class="emtxt">No entries yet</div></div></div>
+    </div>
+
+    <!-- STUDENT CARE (Disputes/Complaints + Mentor Log) -->
+    <div class="sec" id="sec-care">
+      <div class="crumb" onclick="showSec('hub-more')">‹ More</div>
+      <div class="ptitle">Student Care</div>
+      <div class="psub">Disputes, complaints &amp; mentor session logs</div>
+      <div class="stabs" id="careTabs">
+        <div class="stab active" onclick="setCareTab('dispute',this)">⚖️ Disputes</div>
+        <div class="stab" onclick="setCareTab('complaint',this)">📢 Complaints</div>
+        <div class="stab" onclick="setCareTab('mentor',this)">🧑‍🏫 Mentor Log</div>
+      </div>
+
+      <div class="gc" id="careFormDispute">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">⚖️ New Dispute</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="dispStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="fld"><label>Details</label><textarea class="gta" id="dispNote" placeholder="What is the dispute about..."></textarea></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveCareEntry('disputes')">💾 Log Dispute</button>
+      </div>
+      <div class="gc" id="careFormComplaint" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📢 New Complaint</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="compStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="fld"><label>Details</label><textarea class="gta" id="compNote" placeholder="Complaint details..."></textarea></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveCareEntry('complaints')">💾 Log Complaint</button>
+      </div>
+      <div class="gc" id="careFormMentor" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🧑‍🏫 New Mentor Session</div>
+        <div class="fld"><label>Student Name</label><input class="gi" id="mentStudent" placeholder="Student name" list="libNameList"></div>
+        <div class="frow">
+          <div class="fld"><label>Date</label><input class="gi" type="date" id="mentDate"></div>
+          <div class="fld"><label>Duration (minutes)</label><input class="gi" type="number" id="mentDuration" placeholder="e.g. 30"></div>
+        </div>
+        <div class="fld"><label>Issues / Notes Discussed</label><textarea class="gta" id="mentNote" placeholder="What was discussed in the session..."></textarea></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveCareEntry('mentor_logs')">💾 Log Session</button>
+      </div>
+
+      <div class="sh"><div class="sht" id="careListTitle">Open Disputes</div></div>
+      <div class="srchwrap" style="margin-bottom:10px;">
+        <input class="gi" id="caresrch" placeholder="🔍 Search by student name..." oninput="renderCareList()">
+        <button type="button" class="srchbtn" onclick="renderCareList()">🔍</button>
+      </div>
+      <div id="careList"><div class="empty"><div class="emico">⚖️</div><div class="emtxt">No entries yet</div></div></div>
+    </div>
+
+    <!-- MARKETING -->
+    <div class="sec" id="sec-marketing">
+      <div class="crumb" onclick="showSec('hub-more')">‹ More</div>
+      <div class="ptitle">Marketing</div>
+      <div class="psub">Social links, cold-calling, coordinator shifts &amp; results</div>
+      <div class="stabs" id="mktTabs">
+        <div class="stab active" onclick="setMktTab('social',this)">🔗 Social Links</div>
+        <div class="stab" onclick="setMktTab('cold',this)">📞 Cold Calling</div>
+        <div class="stab" onclick="setMktTab('coord',this)">🧑‍💼 Coordinator</div>
+        <div class="stab" onclick="setMktTab('results',this)">📊 Results</div>
+      </div>
+
+      <div class="gc" id="mktFormSocial">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🔗 New Social Media Post/Link</div>
+        <div class="frow">
+          <div class="fld"><label>Platform</label>
+            <select class="gs" id="smPlatform"><option>Facebook</option><option>Instagram</option><option>YouTube</option><option>LinkedIn</option><option>WhatsApp Status</option><option>Other</option></select>
+          </div>
+          <div class="fld"><label>Date</label><input class="gi" type="date" id="smDate"></div>
+        </div>
+        <div class="fld"><label>Link URL</label><input class="gi" id="smLink" placeholder="https://..."></div>
+        <div class="fld"><label>Campaign / Notes</label><input class="gi" id="smNote" placeholder="What is this post about?"></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveMktEntry()">💾 Save Link</button>
+      </div>
+
+      <div class="gc" id="mktFormCold" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📞 New Cold Call</div>
+        <div class="fld"><label>Contact Name</label><input class="gi" id="ccName" placeholder="Name" list="libNameList"></div>
+        <div class="fld"><label>Category</label>
+          <select class="gs" id="ccCategory">
+            <option>Students/Parents</option><option>Counsellors/Parents</option><option>Youtubers</option><option>Friends/Relatives/Anonymous</option>
+          </select>
+        </div>
+        <div class="frow">
+          <div class="fld"><label>Phone</label><input class="gi" type="tel" id="ccPhone" placeholder="+91 XXXXX"></div>
+          <div class="fld"><label>Outcome</label>
+            <select class="gs" id="ccOutcome"><option>Interested</option><option>Follow-up Needed</option><option>Not Interested</option><option>No Response</option></select>
+          </div>
+        </div>
+        <div class="fld"><label>Notes</label><textarea class="gta" id="ccNote" placeholder="Call notes..."></textarea></div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveMktEntry()">💾 Log Call</button>
+      </div>
+
+      <div class="gc" id="mktFormCoord" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🧑‍💼 Coordinator Shift Attendance</div>
+        <div class="fld"><label>Coordinator Name</label><input class="gi" id="coName" placeholder="Name"></div>
+        <div class="fld"><label>Date</label><input class="gi" type="date" id="coDate"></div>
+        <div class="frow">
+          <div class="fld"><label>1st Shift</label>
+            <div class="chips"><input type="radio" class="chi" name="co1" id="co1p" value="P" checked><label class="chl" for="co1p">✅ Present</label><input type="radio" class="chi" name="co1" id="co1a" value="A"><label class="chl" for="co1a">❌ Absent</label></div>
+          </div>
+          <div class="fld"><label>2nd Shift</label>
+            <div class="chips"><input type="radio" class="chi" name="co2" id="co2p" value="P" checked><label class="chl" for="co2p">✅ Present</label><input type="radio" class="chi" name="co2" id="co2a" value="A"><label class="chl" for="co2a">❌ Absent</label></div>
+          </div>
+        </div>
+        <button class="gbtn gbtn-pu gbtn-full" onclick="saveMktEntry()">💾 Save Attendance</button>
+      </div>
+
+      <div class="gc" id="mktFormResults" style="display:none;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📊 Upload Results (Excel)</div>
+        <p style="font-size:11px;color:var(--t3);margin-bottom:10px;">Expected columns: Student Name, Result/Marks, Parent Number</p>
+        <button class="gbtn gbtn-gl gbtn-full" onclick="document.getElementById('resultsUpload').click()">📊 Choose Excel File</button>
+        <input type="file" id="resultsUpload" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleResultsUpload(event)">
+      </div>
+
+      <div class="sh"><div class="sht" id="mktListTitle">Social Links</div></div>
+      <div class="srchwrap" style="margin-bottom:10px;">
+        <input class="gi" id="mktsrch" placeholder="🔍 Search..." oninput="renderMktList()">
+        <button type="button" class="srchbtn" onclick="renderMktList()">🔍</button>
+      </div>
+      <div id="mktList"><div class="empty"><div class="emico">📢</div><div class="emtxt">No entries yet</div></div></div>
+    </div>
+
     <!-- EXPENSES -->
     <div class="sec" id="sec-expenses">
+      <div class="crumb" onclick="showSec('hub-finance')">‹ Finance</div>
       <div class="ptitle">Expenses</div>
       <div class="psub">Travel, food, hotel and media costs</div>
       <div class="sgrid">
@@ -370,6 +823,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 
     <!-- LEADS CONTROL -->
     <div class="sec" id="sec-leads">
+      <div class="crumb" onclick="showSec('hub-admissions')">‹ Admissions</div>
       <div class="ptitle">Leads Control 🎯</div>
       <div class="psub">Contacts, sharing &amp; reports — all in one place</div>
       <div class="sgrid">
@@ -431,6 +885,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 
     <!-- REPORTS -->
     <div class="sec" id="sec-reports">
+      <div class="crumb" onclick="showSec('hub-more')">‹ More</div>
       <div class="ptitle">Reports</div>
       <div class="psub">Export and share reports individually</div>
       <div class="stabs">
@@ -445,6 +900,7 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 
     <!-- NOTICES -->
     <div class="sec" id="sec-notices">
+      <div class="crumb" onclick="showSec('hub-more')">‹ More</div>
       <div class="ptitle">Notices 🔔</div>
       <div class="psub">Updates from administration</div>
       <div id="nlist"><div class="loading"><span class="spin"></span>Loading...</div></div>
@@ -575,6 +1031,27 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
         <div id="gsrchResults"></div>
       </div>
       <div class="gc">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🎓 College Branding (for Marksheets)</div>
+        <p style="font-size:11px;color:var(--t3);margin-bottom:10px;">Upload a college's logo once — Marksheets generated for that college will automatically use it as the letterhead instead of your org name.</p>
+        <div class="fld"><label>College Name</label><input class="gi" id="brandCollege" placeholder="e.g. Chitwan Medical College" list="libNameList"></div>
+        <div class="fld"><label>Logo</label>
+          <input type="file" id="brandLogoInput" accept="image/*" style="display:none" onchange="handleBrandLogo(event)">
+          <button type="button" class="gbtn gbtn-gl gbtn-sm" onclick="document.getElementById('brandLogoInput').click()">📎 Choose Logo Image</button>
+          <span id="brandLogoTxt" style="font-size:11px;color:var(--t3);margin-left:8px;">No logo chosen</span>
+        </div>
+        <button class="gbtn gbtn-pu gbtn-sm" onclick="saveCollegeBranding()">💾 Save Branding</button>
+        <div id="brandList" style="margin-top:12px;"></div>
+      </div>
+      <div class="gc">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">☁️ Data Backup (Google Drive)</div>
+        <p style="font-size:11px;color:var(--t3);margin-bottom:10px;">Backs up all Visitors, Leads, Attendance and Expense data to your Google Drive as a JSON file, and can restore it on any device.</p>
+        <div class="brow">
+          <button class="gbtn gbtn-tl gbtn-sm" onclick="backupToDrive()">☁️ Backup Now</button>
+          <button class="gbtn gbtn-gl gbtn-sm" onclick="restoreFromDrive()">⬇️ Restore Latest Backup</button>
+        </div>
+        <div id="driveBackupStatus" style="font-size:11px;color:var(--t3);margin-top:8px;"></div>
+      </div>
+      <div class="gc">
         <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📱 Install App</div>
         <p style="font-size:12px;color:var(--t2);line-height:1.8;">
           <strong style="color:var(--tx);">Android Chrome:</strong> Menu (⋮) → Add to Home Screen<br>
@@ -596,14 +1073,12 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
   </div>
 
   <div class="bnav">
-    <div class="nbtn active" onclick="showSec('dashboard',this)"><div class="ni">🏠</div><div class="nl">Home</div></div>
-    <div class="nbtn" onclick="showSec('visitors',this)"><div class="ni">👥</div><div class="nl">Visitors</div></div>
-    <div class="nbtn" onclick="showSec('leads',this)"><div class="ni">🎯</div><div class="nl">Leads</div></div>
-    <div class="nbtn" onclick="showSec('attendance',this)"><div class="ni">📋</div><div class="nl">Attend.</div></div>
-    <div class="nbtn" onclick="showSec('expenses',this)"><div class="ni">💰</div><div class="nl">Expenses</div></div>
-    <div class="nbtn" onclick="showSec('reports',this)"><div class="ni">📊</div><div class="nl">Reports</div></div>
-    <div class="nbtn" onclick="showSec('notices',this)"><div class="ni">🔔<span class="nbadge" id="nbadge">0</span></div><div class="nl">Notices</div></div>
-    <div class="nbtn" id="adminNavBtn" style="display:none;" onclick="showSec('admin',this)"><div class="ni">🔑</div><div class="nl">Admin</div></div>
+    <div class="nbtn active" data-navkey="dashboard" onclick="showSec('dashboard',this)"><div class="ni">🏠</div><div class="nl">Home</div></div>
+    <div class="nbtn" data-navkey="hub-admissions" onclick="showSec('hub-admissions',this)"><div class="ni">🎯</div><div class="nl">Admissions</div></div>
+    <div class="nbtn" data-navkey="hub-academics" onclick="showSec('hub-academics',this)"><div class="ni">🎓</div><div class="nl">Academics</div></div>
+    <div class="nbtn" data-navkey="hub-finance" onclick="showSec('hub-finance',this)"><div class="ni">💰</div><div class="nl">Finance</div></div>
+    <div class="nbtn" data-navkey="hub-more" onclick="showSec('hub-more',this)"><div class="ni">🔔<span class="nbadge" id="nbadge">0</span></div><div class="nl">More</div></div>
+    <div class="nbtn" id="adminNavBtn" data-navkey="admin" style="display:none;" onclick="showSec('admin',this)"><div class="ni">🔑</div><div class="nl">Admin</div></div>
   </div>
 </div>
 
@@ -624,11 +1099,16 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
     <div class="fld"><label>Name *</label><input class="gi" id="vn" placeholder="Full name"></div>
     <div class="fld"><label>Type</label><select class="gs" id="vvt"><option>Student</option><option>Parent</option><option>Consultant</option><option>Agent</option><option>Both</option></select></div>
   </div>
-  <div class="fld"><label>📷 Take Picture (auto-added to report)</label>
-    <div class="upa" style="padding:9px;text-align:left;display:flex;align-items:center;gap:8px;" onclick="document.getElementById('vPhotoInput').click()">
-      <input type="file" id="vPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleVisitorPhoto(event)">
+  <div class="fld"><label>📷 Photo (auto-added to report)</label>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="file" id="vPhotoInputCam" accept="image/*" capture="environment" style="display:none" onchange="handleVisitorPhoto(event)">
+      <input type="file" id="vPhotoInputGal" accept="image/*" style="display:none" onchange="handleVisitorPhoto(event)">
+      <button type="button" class="gbtn gbtn-gl gbtn-sm" onclick="document.getElementById('vPhotoInputCam').click()">📷 Camera</button>
+      <button type="button" class="gbtn gbtn-gl gbtn-sm" onclick="document.getElementById('vPhotoInputGal').click()">🖼️ Gallery</button>
+    </div>
+    <div class="upa" style="padding:9px;text-align:left;display:flex;align-items:center;gap:8px;margin-top:6px;">
       <img id="vPhotoPreview" style="width:34px;height:34px;border-radius:8px;object-fit:cover;display:none;" alt="preview">
-      <span id="vPhotoTxt" style="font-size:12px;color:var(--t3);">Tap to capture a photo</span>
+      <span id="vPhotoTxt" style="font-size:12px;color:var(--t3);">No photo yet — use Camera or Gallery above</span>
     </div>
   </div>
   <div class="frow">
@@ -837,11 +1317,16 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
   <div class="fld"><label>Purpose</label><input class="gi" id="epur" placeholder="What for?"></div>
   <div class="fld"><label>Related Visitor</label><input class="gi" id="erv" placeholder="Visitor name (optional)"></div>
   <div class="fld">
-    <label>Receipt Photo</label>
-    <div class="upa" onclick="document.getElementById('rcpt').click()">
-      <input type="file" id="rcpt" accept="image/*,application/pdf" style="display:none" onchange="handleR(event)">
+    <label>Receipt / Bill Photo</label>
+    <div style="display:flex;gap:8px;margin-bottom:6px;">
+      <input type="file" id="rcptCam" accept="image/*" capture="environment" style="display:none" onchange="handleR(event)">
+      <input type="file" id="rcptGal" accept="image/*,application/pdf" style="display:none" onchange="handleR(event)">
+      <button type="button" class="gbtn gbtn-gl gbtn-sm" onclick="document.getElementById('rcptCam').click()">📷 Camera</button>
+      <button type="button" class="gbtn gbtn-gl gbtn-sm" onclick="document.getElementById('rcptGal').click()">🖼️ Gallery</button>
+    </div>
+    <div class="upa">
       <div style="font-size:26px;">📎</div>
-      <div style="font-size:12px;color:var(--t3);" id="rtxt">Tap to upload receipt</div>
+      <div style="font-size:12px;color:var(--t3);" id="rtxt">No receipt attached yet</div>
     </div>
   </div>
   <button class="gbtn gbtn-or gbtn-full" onclick="saveE()" style="margin-top:8px;">💾 Save Expense</button>
@@ -879,7 +1364,40 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
     <div class="fld"><label>Email</label><input class="gi" id="ldem" placeholder="email@example.com"></div>
   </div>
   <div class="frow">
-    <div class="fld"><label>College / Org</label><input class="gi" id="ldco" placeholder="College name"></div>
+    <div class="fld"><label>College / Org</label>
+      <select class="gi" id="ldco" onchange="toggleLdcoOther()">
+        <option value="">Select college...</option>
+        <option>B.P. Koirala Institute of Health Sciences (BPKIHS), Dharan</option>
+        <option>Institute of Medicine (IOM), Maharajgunj, Kathmandu</option>
+        <option>Patan Academy of Health Sciences (PAHS), Lalitpur</option>
+        <option>Karnali Academy of Health Sciences (KAHS), Jumla</option>
+        <option>Rapti Academy of Health Sciences (RAHS), Dang</option>
+        <option>Pokhara Academy of Health Sciences, Pokhara</option>
+        <option>Madan Bhandari Academy of Health Sciences, Karnali</option>
+        <option>Kathmandu University School of Medical Sciences (KUSMS), Dhulikhel</option>
+        <option>Nepal Medical College, Kathmandu</option>
+        <option>Kathmandu Medical College, Kathmandu</option>
+        <option>KIST Medical College, Lalitpur</option>
+        <option>Gandaki Medical College, Pokhara</option>
+        <option>Chitwan Medical College, Bharatpur</option>
+        <option>Nobel Medical College, Biratnagar</option>
+        <option>Birat Medical College, Biratnagar</option>
+        <option>National Medical College, Birgunj</option>
+        <option>Janaki Medical College, Janakpur</option>
+        <option>Nepalgunj Medical College, Nepalgunj</option>
+        <option>Lumbini Medical College, Palpa</option>
+        <option>Universal College of Medical Sciences (UCMS), Bhairahawa</option>
+        <option>College of Medical Sciences (CMS), Bharatpur</option>
+        <option>Manipal College of Medical Sciences (MCOMS), Pokhara</option>
+        <option>Devdaha Medical College and Research Institute (DMCRI), Rupandehi</option>
+        <option>B &amp; C Medical College, Jhapa</option>
+        <option>Nepalese Army Institute of Health Sciences (NAIHS), Kathmandu</option>
+        <option>Purbanchal University Faculty of Medical &amp; Allied Sciences (PUFOMAS), Morang</option>
+        <option>Shahid Dharma Bhakta National Transplant Center, Kathmandu</option>
+        <option value="__other__">Other (type manually)</option>
+      </select>
+      <input class="gi" id="ldcoOther" placeholder="Enter college / organization name" style="display:none;margin-top:6px;">
+    </div>
     <div class="fld"><label>Status</label>
       <select class="gs" id="ldst">
         <option value="New">New</option><option value="Interested">Interested</option>
@@ -982,6 +1500,30 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
     <button class="gbtn gbtn-tl" onclick="copyMeetLink()">📋 Copy</button>
     <button class="gbtn gbtn-gl" onclick="sendMeetLinkWA()">💬 Send via WhatsApp</button>
   </div>
+
+  <div class="fld" style="margin-top:14px;">
+    <label>⏱️ Meeting Timer</label>
+    <div class="brow">
+      <button class="gbtn gbtn-tl gbtn-sm" onclick="startMeetingTimer()">▶ Start Meeting</button>
+      <button class="gbtn gbtn-gl gbtn-sm" onclick="endMeetingTimer()">⏹ End Meeting</button>
+    </div>
+    <div id="meetDurationTxt" style="font-size:11px;color:var(--t3);margin-top:6px;">Not started yet</div>
+  </div>
+
+  <div class="fld"><label>👥 Number of Joinings</label>
+    <input class="gi" type="number" min="0" id="meetJoinCount" placeholder="e.g. 3 (enter manually after the call)">
+    <p style="font-size:10px;color:var(--t3);margin-top:4px;">Google's join-count data needs a paid Workspace admin account, which isn't available here — enter the count manually and it'll still autofeed the report below.</p>
+  </div>
+
+  <div class="fld"><label>📝 Meeting Notes (type or speak key points)</label>
+    <textarea class="gta" id="meetNotes" placeholder="Type or use the mic to speak what was discussed..."></textarea>
+    <div class="brow" style="margin-top:6px;">
+      <button class="gbtn gbtn-gl gbtn-sm" id="meetRecBtn" onclick="toggleMeetRecord()">🎤 Tap to Speak</button>
+      <button class="gbtn gbtn-bl gbtn-sm" onclick="aiSummarizeMeeting()">✨ Gemini Summarize</button>
+    </div>
+  </div>
+  <div class="fld"><label>Summary (editable)</label><textarea class="gta" id="meetSummary" placeholder="Gemini's structured summary appears here..."></textarea></div>
+  <button class="gbtn gbtn-pu gbtn-full" onclick="saveMeetingRecord()">💾 Save Meeting to Lead &amp; Final Report</button>
 </div></div>
 
 <!-- UNIVERSAL REPORT STUDIO -->
@@ -990,6 +1532,12 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
   <div class="mtitle" id="reportTitle">📊 Report <button class="cbtn" onclick="closeM('mreport')">✕</button></div>
   <div id="reportPhotoWrap" style="text-align:center;margin-bottom:10px;display:none;"><img id="reportPhoto" style="width:88px;height:88px;border-radius:16px;object-fit:cover;border:2px solid var(--b2);box-shadow:0 4px 16px rgba(120,105,180,0.15);"></div>
   <div style="font-size:11px;color:var(--t3);margin-bottom:10px;" id="reportTargetLbl">—</div>
+  <div class="fld" id="attAttachModeWrap" style="display:none;margin-bottom:8px;">
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:400;">
+      <input type="checkbox" id="attShowAttachDetail" onchange="regenerateAttReport()">
+      Show attachment file names in report (unchecked = just shows "Application submitted")
+    </label>
+  </div>
   <div class="brow" style="margin-bottom:4px;">
     <button class="gbtn gbtn-bl gbtn-sm" onclick="aiPolishReport()">✨ AI Professional Rewrite</button>
     <button class="gbtn gbtn-gl gbtn-sm" onclick="resetReportManual()">↺ Reset to Manual</button>
@@ -1011,6 +1559,32 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-seri
 </div></div>
 
 <div class="toast" id="toast"></div>
+
+<!-- FIRST-TIME SETUP WIZARD (white-label onboarding) -->
+<div class="mov" id="msetup" style="z-index:9999;">
+  <div class="modal">
+    <div class="mtitle">👋 Quick Setup <span style="font-size:11px;font-weight:400;color:var(--t3);">(one-time)</span></div>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6;">Set these up once and this device won't ask again. You can also change them later in Settings.</p>
+
+    <div class="gc" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;">🤖 AI (Gemini) Key</div>
+      <input class="gi" id="setupAiK" type="password" placeholder="Paste your free Gemini API key">
+      <p style="font-size:10px;color:var(--t3);margin:6px 0 0;">Get a free key at aistudio.google.com → Get API Key. Powers AI reports, call summaries & meeting auto-summary.</p>
+    </div>
+
+    <div class="gc" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;">🔗 Google Account</div>
+      <p style="font-size:11px;color:var(--t2);margin-bottom:8px;">One-time permission for Contacts sync + Google Drive backup — asked together now instead of separately later.</p>
+      <button class="gbtn gbtn-tl gbtn-sm" id="setupGoogleBtn" onclick="setupConnectGoogle()">🔗 Connect Google Account</button>
+      <div id="setupGoogleStatus" style="font-size:11px;color:var(--t3);margin-top:6px;"></div>
+    </div>
+
+    <div class="brow">
+      <button class="gbtn gbtn-gl gbtn-sm" onclick="skipSetupWizard()">Skip for now</button>
+      <button class="gbtn gbtn-pu gbtn-sm" onclick="finishSetupWizard()">✅ Save &amp; Continue</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
